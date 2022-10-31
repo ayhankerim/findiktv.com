@@ -1,5 +1,5 @@
 import ErrorPage from "next/error"
-import { getPageData, fetchAPI, getGlobalData } from "utils/api"
+import { getPageData, fetchAPI, getAdsData, getGlobalData } from "utils/api"
 import Sections from "@/components/sections"
 import Seo from "@/components/elements/seo"
 import { useRouter } from "next/router"
@@ -10,7 +10,14 @@ import { getLocalizedPaths } from "utils/localize"
 // optional catch all routes feature. See the related docs:
 // https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes
 
-const DynamicPage = ({ sections, metadata, preview, global, pageContext }) => {
+const DynamicPage = ({
+  sections,
+  advertisement,
+  metadata,
+  preview,
+  global,
+  pageContext,
+}) => {
   const router = useRouter()
 
   // Check if the required data was provided
@@ -33,7 +40,11 @@ const DynamicPage = ({ sections, metadata, preview, global, pageContext }) => {
   }
 
   return (
-    <Layout global={global} pageContext={pageContext}>
+    <Layout
+      global={global}
+      pageContext={pageContext}
+      advertisement={advertisement}
+    >
       {/* Add meta tags for SEO*/}
       <Seo metadata={metadataWithDefaults} />
       {/* Display content sections */}
@@ -75,6 +86,7 @@ export async function getStaticProps(context) {
   const { params, locale, locales, defaultLocale, preview = null } = context
 
   const globalLocale = await getGlobalData(locale)
+  const advertisement = await getAdsData()
   // Fetch pages. Include drafts if preview mode is on
   const pageData = await getPageData({
     slug: (!params.slug ? [""] : params.slug).join("/"),
@@ -104,6 +116,7 @@ export async function getStaticProps(context) {
     props: {
       preview,
       sections: contentSections,
+      advertisement: advertisement,
       metadata,
       global: globalLocale.data,
       pageContext: {
@@ -111,6 +124,7 @@ export async function getStaticProps(context) {
         localizedPaths,
       },
     },
+    revalidate: 15,
   }
 }
 

@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reactions",
+  "info": {
+    "singularName": "reaction",
+    "pluralName": "reactions",
+    "displayName": "Reaction",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "angry": {
+      "type": "integer",
+      "default": 0
+    },
+    "dislike": {
+      "type": "integer",
+      "default": 0
+    },
+    "applause": {
+      "type": "integer",
+      "default": 0
+    },
+    "love": {
+      "type": "integer",
+      "default": 0
+    },
+    "sad": {
+      "type": "integer",
+      "default": 0
+    },
+    "shocked": {
+      "type": "integer",
+      "default": 0
+    },
+    "lol": {
+      "type": "integer",
+      "default": 0
+    },
+    "article": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::article.article",
+      "inversedBy": "reaction"
+    }
+  }
+}

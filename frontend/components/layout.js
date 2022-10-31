@@ -3,7 +3,7 @@ import Navbar from "./elements/navbar"
 import Footer from "./elements/footer"
 import NotificationBanner from "./elements/notification-banner"
 
-const Layout = ({ children, global, pageContext }) => {
+const Layout = ({ children, global, pageContext, advertisement }) => {
   const { navbar, footer, notificationBanner } = global.attributes
 
   const [bannerIsShown, setBannerIsShown] = useState(true)
@@ -17,11 +17,15 @@ const Layout = ({ children, global, pageContext }) => {
             closeSelf={() => setBannerIsShown(false)}
           />
         )}
-        <Navbar navbar={navbar} pageContext={pageContext} />
-        <div>{children}</div>
+        <Navbar
+          navbar={navbar}
+          pageContext={pageContext}
+          advertisement={advertisement}
+        />
+        <>{children}</>
       </div>
       {/* Aligned to the bottom */}
-      <Footer footer={footer} />
+      <Footer footer={footer} advertisement={advertisement} />
     </div>
   )
 }

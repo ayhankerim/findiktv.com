@@ -1,4 +1,3 @@
-import Markdown from "react-markdown"
 import { getButtonAppearance } from "utils/button"
 import ButtonLink from "../elements/button-link"
 import NextImage from "../elements/image"
@@ -25,9 +24,10 @@ const Hero = ({ data }) => {
           ))}
         </div>
         {/* Small rich text */}
-        <div className="text-base md:text-sm mt-4 sm:mt-3 rich-text-hero">
-          <Markdown>{data.smallTextWithLink}</Markdown>
-        </div>
+        <div
+          className="text-base md:text-sm mt-4 sm:mt-3 rich-text-hero"
+          dangerouslySetInnerHTML={{ __html: data.smallTextWithLink }}
+        />
       </div>
       {/* Right column for the image */}
       <div className="flex-shrink-0 w-full md:w-6/12 mt-6 md:mt-0">

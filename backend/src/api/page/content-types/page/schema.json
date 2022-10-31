@@ -5,7 +5,8 @@
     "singularName": "page",
     "pluralName": "pages",
     "displayName": "Page",
-    "name": "page"
+    "name": "page",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -59,11 +60,20 @@
     "slug": {
       "pluginOptions": {
         "i18n": {
-          "localized": false
+          "localized": true
         }
       },
       "type": "string",
       "regex": "^$|^[a-zA-Z/-]+$"
+    },
+    "comment": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "customField",
+      "customField": "plugin::comments.comments"
     }
   }
 }

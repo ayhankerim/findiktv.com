@@ -5,7 +5,8 @@
     "singularName": "lead-form-submission",
     "pluralName": "lead-form-submissions",
     "displayName": "Lead form submission",
-    "name": "lead-form-submission"
+    "name": "lead-form-submission",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -14,7 +15,8 @@
   },
   "attributes": {
     "email": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "status": {
       "type": "enumeration",

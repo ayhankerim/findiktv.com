@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contacts",
+  "info": {
+    "singularName": "contact",
+    "pluralName": "contacts",
+    "displayName": "Contact"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "topic": {
+      "type": "enumeration",
+      "enum": [
+        "General",
+        "News",
+        "Partnership",
+        "Advertisement"
+      ],
+      "default": "General"
+    },
+    "ip": {
+      "type": "string",
+      "maxLength": 20
+    }
+  }
+}

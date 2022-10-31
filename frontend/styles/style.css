@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html {
+  @apply text-sm;
+  @apply text-gray-900;
+  @apply bg-lightgray;
+  font-family: 'Dosis', sans-serif;
+  scroll-behavior: smooth;
+}
+
+article h2 {
+  @apply text-xl;
+  @apply font-semibold;
+  @apply text-secondary;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+article p {
+  padding-bottom: 10px;
+}
+article a {
+  @apply font-semibold;
+  @apply text-secondary;
+  @apply underline;
+}
+article a:hover {
+  @apply text-dark;
+  @apply no-underline;
+}
+article .adsInline .band {
+    position: relative;
+    display: flex;
+    height: 1.6rem;
+    margin-bottom: 1rem;
+}
+article .adsInline .band span {
+    position: relative;
+    flex: 1;
+    @apply text-sm;
+    display: inline-block;
+    @apply text-center;
+    @apply text-midgray;
+    padding: 0 1rem;
+    z-index: 1;
+}
+article .adsInline .band:before, article .adsInline .band:after {
+    content: "";
+    flex: 2;
+    margin: .7rem auto;
+    @apply border-t;
+    @apply border-midgray;
+}
+@media screen and (min-width: 640px) {
+  html {
+
+  }
+}
+
+@media screen and (min-width: 768px) {
+  html {
+
+  }
+}

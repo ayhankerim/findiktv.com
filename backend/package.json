@@ -1,11 +1,15 @@
 {
   "dependencies": {
+    "@_sh/strapi-plugin-ckeditor": "^1.1.2",
     "@strapi/plugin-graphql": "^4.0.0",
-    "lodash.set": "^4.3.2",
-    "@strapi/strapi": "4.4.5",
-    "@strapi/plugin-users-permissions": "4.4.5",
     "@strapi/plugin-i18n": "4.4.5",
-    "mysql": "2.18.1"
+    "@strapi/plugin-users-permissions": "4.4.5",
+    "@strapi/provider-email-nodemailer": "^4.4.5",
+    "@strapi/strapi": "4.4.5",
+    "lodash.set": "^4.3.2",
+    "mysql": "2.18.1",
+    "strapi-plugin-comments": "^2.2.0",
+    "strapi-plugin-email-designer": "^2.1.1"
   },
   "name": "backend",
   "private": true,

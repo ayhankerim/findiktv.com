@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "merchants",
+  "info": {
+    "singularName": "merchant",
+    "pluralName": "merchants",
+    "displayName": "Merchant"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 250,
+      "minLength": 10
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "mobile": {
+      "type": "integer",
+      "min": 10,
+      "max": 10,
+      "required": true
+    },
+    "city": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::city.city",
+      "inversedBy": "merchants"
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "inversedBy": "merchants"
+    },
+    "address": {
+      "type": "text",
+      "required": true
+    },
+    "logo": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
+    },
+    "gallery": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "website": {
+      "type": "string",
+      "maxLength": 150
+    }
+  }
+}
