@@ -11,6 +11,10 @@ module.exports = {
         destination: "/api/views/:path*",
       },
       {
+        source: "/api/auth/:path*",
+        destination: "/api/auth/:path*",
+      },
+      {
         source: "/api/:path*",
         destination: `${process.env.STRAPI_API_URL}/api/:path*`,
       },

@@ -13,7 +13,8 @@ import Advertisement from "@/components/elements/advertisement"
 import ArticleDates from "@/components/elements/date"
 import ViewCounter from "@/components/elements/pageviews"
 import ArticleShare from "@/components/elements/share"
-import ArticleEmoji from "@/components/elements/reactions"
+import ArticleReactions from "@/components/elements/reactions"
+import ArticleComments from "@/components/elements/comments"
 import { useRouter } from "next/router"
 import Layout from "@/components/layout"
 import { getLocalizedPaths } from "@/utils/localize"
@@ -149,12 +150,17 @@ const DynamicArticle = ({
             }}
           />
           {articleContent.reaction && (
-            <ArticleEmoji
+            <ArticleReactions
               article={articleContent.id}
               reactions={articleContent.reaction}
             />
           )}
-          <section className="commentSection">YORUMLAR</section>
+          {articleContent.comment && (
+            <ArticleComments
+              article={articleContent.id}
+              comment={articleContent.comment}
+            />
+          )}
         </div>
         <aside className="flex-none w-[336px]">01</aside>
       </main>

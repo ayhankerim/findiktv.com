@@ -5,9 +5,10 @@ import { useRouter } from "next/router"
 import { DefaultSeo } from "next-seo"
 import { getStrapiMedia } from "utils/media"
 import { getGlobalData } from "utils/api"
+import { SessionProvider } from "next-auth/react"
 import "@/styles/style.css"
 
-const MyApp = ({ Component, pageProps }) => {
+const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
   // Extract the data we need
   const { global } = pageProps
   if (global == null) {
@@ -18,36 +19,38 @@ const MyApp = ({ Component, pageProps }) => {
 
   return (
     <>
-      {/* Favicon */}
-      <Head>
-        <link
-          rel="shortcut icon"
-          href={getStrapiMedia(favicon.data.attributes.url)}
+      <SessionProvider session={session}>
+        {/* Favicon */}
+        <Head>
+          <link
+            rel="shortcut icon"
+            href={getStrapiMedia(favicon.data.attributes.url)}
+          />
+        </Head>
+        {/* Global site metadata */}
+        <DefaultSeo
+          titleTemplate={`%s | ${metaTitleSuffix}`}
+          title="Page"
+          description={metadata.metaDescription}
+          openGraph={{
+            images: Object.values(
+              metadata.shareImage.data.attributes.formats
+            ).map((image) => {
+              return {
+                url: getStrapiMedia(image.url),
+                width: image.width,
+                height: image.height,
+              }
+            }),
+          }}
+          twitter={{
+            cardType: metadata.twitterCardType,
+            handle: metadata.twitterUsername,
+          }}
         />
-      </Head>
-      {/* Global site metadata */}
-      <DefaultSeo
-        titleTemplate={`%s | ${metaTitleSuffix}`}
-        title="Page"
-        description={metadata.metaDescription}
-        openGraph={{
-          images: Object.values(
-            metadata.shareImage.data.attributes.formats
-          ).map((image) => {
-            return {
-              url: getStrapiMedia(image.url),
-              width: image.width,
-              height: image.height,
-            }
-          }),
-        }}
-        twitter={{
-          cardType: metadata.twitterCardType,
-          handle: metadata.twitterUsername,
-        }}
-      />
-      {/* Display the content */}
-      <Component {...pageProps} />
+        {/* Display the content */}
+        <Component {...pageProps} />
+      </SessionProvider>
     </>
   )
 }

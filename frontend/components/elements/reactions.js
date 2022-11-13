@@ -108,7 +108,6 @@ const Reactions = ({ article, reactions }) => {
         sum += value
       }
     })
-  console.log(reactionsData)
   return (
     <section className="commentSection">
       <div className="flex flex-row items-center justify-between border-b border-midgray">
