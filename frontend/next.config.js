@@ -7,6 +7,10 @@ module.exports = {
         destination: `${process.env.STRAPI_API_URL}/uploads/:path*`,
       },
       {
+        source: "/api/views/:path*",
+        destination: "/api/views/:path*",
+      },
+      {
         source: "/api/:path*",
         destination: `${process.env.STRAPI_API_URL}/api/:path*`,
       },

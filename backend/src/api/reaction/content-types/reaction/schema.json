@@ -44,7 +44,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::article.article",
-      "inversedBy": "reaction"
+      "mappedBy": "reaction"
     }
   }
 }

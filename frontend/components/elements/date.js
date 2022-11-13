@@ -7,7 +7,7 @@ import { MdDateRange } from "react-icons/md"
 const ArticleDates = ({ publishedAt, updatedAt }) => {
   const { locale } = useRouter()
   return (
-    <div className="flex gap-2 text-sm mt-4 mb-2">
+    <div className="flex gap-2 text-sm">
       <div className="flex flex-row items-center text-midgray mr-4">
         <MdDateRange className="mr-2" />
         <time className="mt-1 mr-2">

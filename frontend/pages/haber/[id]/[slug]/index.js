@@ -1,16 +1,22 @@
 import React, { useEffect } from "react"
 import ErrorPage from "next/error"
-import { getArticleData, getAdsData, fetchAPI, getGlobalData } from "utils/api"
+import {
+  getArticleData,
+  getAdsData,
+  fetchAPI,
+  getGlobalData,
+} from "@/utils/api"
 import Seo from "@/components/elements/seo"
 import NextImage from "@/components/elements/image"
 import Breadcrumb from "@/components/elements/breadcrumb"
 import Advertisement from "@/components/elements/advertisement"
 import ArticleDates from "@/components/elements/date"
+import ViewCounter from "@/components/elements/pageviews"
 import ArticleShare from "@/components/elements/share"
 import ArticleEmoji from "@/components/elements/reactions"
 import { useRouter } from "next/router"
 import Layout from "@/components/layout"
-import { getLocalizedPaths } from "utils/localize"
+import { getLocalizedPaths } from "@/utils/localize"
 
 // The file is called [[...slug]].js because we're using Next's
 // optional catch all routes feature. See the related docs:
@@ -24,13 +30,6 @@ const DynamicArticle = ({
   global,
   articleContext,
 }) => {
-  useEffect(() => {
-    try {
-      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-    } catch (err) {
-      console.log(err)
-    }
-  }, [])
   const router = useRouter()
 
   // Check if the required data was provided
@@ -125,10 +124,13 @@ const DynamicArticle = ({
           <article className="font-semibold text-xl text-darkgray">
             {articleContent.summary}
           </article>
-          <ArticleDates
-            publishedAt={articleContent.publishedAt}
-            updatedAt={articleContent.updatedAt}
-          />
+          <div className="flex flex-row items-start justify-between mt-4 mb-2">
+            <ArticleDates
+              publishedAt={articleContent.publishedAt}
+              updatedAt={articleContent.updatedAt}
+            />
+            <ViewCounter slug={articleContext.slug} blogPage={true} />
+          </div>
           <ArticleShare
             position="articleTop"
             title={articleContent.title}

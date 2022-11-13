@@ -434,15 +434,7 @@ export async function getAdsData(active) {
   return advertisement.data.advertisements.data
 }
 
-export async function createReaction(
-  angry,
-  dislike,
-  applause,
-  love,
-  sad,
-  shocked,
-  lol
-) {
+export async function createReaction(active) {
   const gqlEndpoint = getStrapiURL("/graphql")
   const adsRes = await fetch(gqlEndpoint, {
     method: "POST",

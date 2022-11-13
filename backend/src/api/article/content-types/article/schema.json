@@ -150,6 +150,14 @@
       "relation": "oneToOne",
       "target": "api::reaction.reaction",
       "inversedBy": "article"
+    },
+    "view": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "integer"
     }
   }
 }
