@@ -2,33 +2,19 @@ import React, { useState } from "react"
 import useSWR, { useSWRConfig } from "swr"
 import { fetchAPI } from "utils/api"
 import { getStrapiMedia } from "utils/media"
-import { useRouter } from "next/router"
 import { MdOutlineEmojiEmotions } from "react-icons/md"
 import Image from "next/image"
+import Tooltip from "@/components/elements/tooltip"
 
-let zerovalue = {
-  data: {
-    id: 1,
-    attributes: {
-      angry: 0,
-      dislike: 0,
-      applause: 0,
-      love: 0,
-      sad: 0,
-      shocked: 0,
-      lol: 0,
-    },
-  },
-}
 let emojis = [
   {
     id: "angry",
-    title: "Kızgın",
+    title: "Kızgınım",
     image: "/uploads/angry_2527bcc861.gif",
   },
   {
     id: "sad",
-    title: "Üzgün",
+    title: "Üzüldüm",
     image: "/uploads/das_118d65fe99.gif",
   },
   {
@@ -109,7 +95,7 @@ const Reactions = ({ article, reactions }) => {
       }
     })
   return (
-    <section className="commentSection">
+    <section className="reactionSection">
       <div className="flex flex-row items-center justify-between border-b border-midgray">
         <h4 className="font-semibold text-base text-midgray">
           BU İÇERİĞE EMOJİYLE TEPKİ VER!
@@ -127,51 +113,54 @@ const Reactions = ({ article, reactions }) => {
                 <div
                   style={{
                     height:
-                      (30 * reactionsData
-                        ? reactionsData?.data?.attributes[emoji.id]
-                        : 1) /
+                      (30 *
+                        (reactionsData
+                          ? reactionsData?.data?.attributes[emoji.id]
+                          : 1)) /
                         sum +
                       "px",
                   }}
-                  className="w-full h-[1px] bg-success"
+                  className="w-full h-[1px] bg-success transition duration-150 ease-out md:ease-in"
                 ></div>
               </div>
-              <button
-                className={`"w-full h-full ${
-                  check[emoji.id]
-                    ? "border border-b-2 border-secondary bg-white shadow-lg"
-                    : "border border-b-2 border-midgray bg-lightgray"
-                } hover:bg-white rounded`}
-                onClick={async () => {
-                  const newNum =
-                    reactionsData?.data?.attributes[emoji.id] +
-                    (check[emoji.id] ? -1 : 1)
-                  const reactionsInfo = {
-                    ...reactionsData?.data?.attributes[emoji.id],
-                    [emoji.id]: newNum,
-                  }
-                  const options = {
-                    optimisticData: reactionsInfo,
-                    rollbackOnError: true,
-                  }
-                  mutate(
-                    `/api/reactions/${reactions.data.id}`,
-                    onSubmit(reactionsInfo),
-                    options
-                  )
-                }}
-              >
-                <Image
-                  loader={loader}
-                  layout="responsive"
-                  width="72"
-                  height="72"
-                  objectFit="contain"
-                  src={emoji.image}
-                  alt={emoji.title}
-                  unoptimized={true}
-                />
-              </button>
+              <Tooltip orientation="bottom" tooltipText={emoji.title}>
+                <button
+                  className={`"w-full h-full ${
+                    check[emoji.id]
+                      ? "border border-b-2 border-secondary bg-white shadow-lg"
+                      : "border border-b-2 border-midgray bg-lightgray"
+                  } hover:bg-white rounded`}
+                  onClick={async () => {
+                    const newNum =
+                      reactionsData?.data?.attributes[emoji.id] +
+                      (check[emoji.id] ? -1 : 1)
+                    const reactionsInfo = {
+                      ...reactionsData?.data?.attributes[emoji.id],
+                      [emoji.id]: newNum,
+                    }
+                    const options = {
+                      optimisticData: reactionsInfo,
+                      rollbackOnError: true,
+                    }
+                    mutate(
+                      `/api/reactions/${reactions.data.id}`,
+                      onSubmit(reactionsInfo),
+                      options
+                    )
+                  }}
+                >
+                  <Image
+                    loader={loader}
+                    layout="responsive"
+                    width="72"
+                    height="72"
+                    objectFit="contain"
+                    src={emoji.image}
+                    alt={emoji.title}
+                    unoptimized={true}
+                  />
+                </button>
+              </Tooltip>
             </div>
           )
         })}

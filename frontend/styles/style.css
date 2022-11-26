@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,23 +5,24 @@ html {
   @apply text-sm;
   @apply text-gray-900;
   @apply bg-lightgray;
-  font-family: 'Dosis', sans-serif;
+  @apply font-sans;
   scroll-behavior: smooth;
 }
 
 article h2 {
   @apply text-xl;
-  @apply font-semibold;
-  @apply text-secondary;
+  @apply font-bold;
+  @apply text-dark;
   padding-top: 20px;
   padding-bottom: 10px;
 }
 
 article p {
   padding-bottom: 10px;
+  @apply font-light;
 }
 article a {
-  @apply font-semibold;
+  @apply font-bold;
   @apply text-secondary;
   @apply underline;
 }
@@ -52,6 +52,28 @@ article .adsInline .band:before, article .adsInline .band:after {
     margin: .7rem auto;
     @apply border-t;
     @apply border-midgray;
+}
+.ql-container {
+  font-family: 'Dosis', sans-serif;
+}
+.ql-toolbar.ql-snow + .ql-container.ql-snow .ql-editor {
+  min-height: 120px;
+  transition: all ease-in 0.1s 0s;
+  @apply text-base;
+  @apply font-sans;
+}
+/* .ql-toolbar.ql-snow + .ql-container.ql-snow .ql-editor:focus {
+  min-height: 150px;
+} */
+.ql-editor ol, .ql-editor ul {
+  padding-left: 0;
+}
+.commentSection .ql-container.ql-snow {
+    @apply border-midgray;
+}
+.commentSection .ql-toolbar.ql-snow {
+    @apply border-midgray;
+    @apply font-sans;
 }
 @media screen and (min-width: 640px) {
   html {

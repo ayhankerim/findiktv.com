@@ -1,59 +1,374 @@
+import React, { useState, useEffect, Fragment } from "react"
 import { signOut, useSession } from "next-auth/react"
-import Head from "next/head"
 import Link from "next/link"
-import React, { useState, useEffect } from "react"
-import useSWR, { useSWRConfig } from "swr"
-import { fetchAPI } from "utils/api"
+import { Menu, Transition } from "@headlessui/react"
+import axios from "axios"
 import { getStrapiMedia } from "utils/media"
-import { useRouter } from "next/router"
-import { MdComment } from "react-icons/md"
 import Image from "next/image"
+import Moment from "moment"
+import "moment/locale/tr"
+import {
+  MdComment,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+  MdPerson,
+  MdClose,
+  MdThumbUp,
+  MdThumbDown,
+} from "react-icons/md"
+import { TbDots } from "react-icons/tb"
+import ProfileCard from "@/components/elements/profile-card"
+import CommentForm from "@/components/elements/comment-form"
+import Tooltip from "@/components/elements/tooltip"
 
-const Comments = ({ article, comment }) => {
+import Example from "./example"
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ")
+}
+const loader = ({ src, width }) => {
+  return getStrapiMedia(src)
+}
+
+const CommentItem = ({ comment }) => {
+  return (
+    <>
+      <div className="flex items-start gap-2 border-b pb-2">
+        <div className="flex-none w-[55px] h-[55px] relative">
+          {comment.attributes.author.data.attributes.avatar.data ? (
+            <Image
+              loader={loader}
+              className="rounded"
+              fill
+              sizes="100vw"
+              style={{
+                objectFit: "cover",
+              }}
+              src={
+                comment.attributes.author.data.attributes.avatar.data.attributes
+                  .formats.thumbnail.url
+              }
+              alt={
+                comment.attributes.author.data.attributes.avatar.data.attributes
+                  .alternativeText
+              }
+            />
+          ) : (
+            <MdPerson style={{ width: 55, height: 55 }} />
+          )}
+        </div>
+        <div className="flex-auto">
+          <div className="flex justify-between gap-2 mb-2">
+            <div className="flex gap-2">
+              <ProfileCard author={comment.attributes.author.data} />
+              <div
+                className="text-midgray"
+                title={Moment(comment.attributes.createdAt).format("LLLL")}
+              >
+                {Moment(comment.attributes.createdAt).fromNow(true)} önce
+              </div>
+            </div>
+            <div className="">
+              <Menu as="div" className="relative ml-3">
+                {({ open }) => (
+                  <>
+                    <div>
+                      <Menu.Button className="flex text-sm text-darkgray hover:text-secondary">
+                        <span className="sr-only">Menü aç</span>
+                        <span className="flex items-center">
+                          {open ? (
+                            <MdClose className="text-midgray" />
+                          ) : (
+                            <TbDots className="text-midgray" />
+                          )}
+                        </span>
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href="#"
+                              onClick={signOut}
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700"
+                              )}
+                            >
+                              Facebook`ta paylaş
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href="/auth/profile"
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700"
+                              )}
+                            >
+                              Yorum bağlantısını kopyala
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href="/auth/setting"
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-danger"
+                              )}
+                            >
+                              Şikayet et
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </>
+                )}
+              </Menu>
+            </div>
+          </div>
+          <div
+            className="text-darkgray mb-1"
+            dangerouslySetInnerHTML={{
+              __html: comment.attributes.content,
+            }}
+          />
+          <div className="flex items-center justify-between gap-2 text-midgray">
+            <Link href="#">Yanıtla</Link>
+            <Example comment={comment.id} />
+            <div className="flex gap-2">
+              <Tooltip orientation="bottom" tooltipText="Katılıyorum">
+                <Link
+                  href="/"
+                  passHref
+                  className="flex justify-between items-center gap-2 py-1 px-2 border rounded hover:text-dark"
+                >
+                  <MdThumbUp />
+                  <span className="text-success">
+                    {comment.attributes.like}
+                  </span>
+                </Link>
+              </Tooltip>
+              <Tooltip orientation="bottom" tooltipText="Katılmıyorum">
+                <Link
+                  href="/"
+                  passHref
+                  className="flex justify-between items-center gap-2 py-1 px-2 border rounded hover:text-dark"
+                >
+                  <MdThumbDown />
+                  <span className="text-danger">
+                    {comment.attributes.dislike}
+                  </span>
+                </Link>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+const Comments = ({ article, comments }) => {
+  const [userData, setUserData] = useState(null)
+  const [error, setError] = useState("")
+  const [loaded, setLoaded] = useState(false)
   const { data: session } = useSession()
-
   useEffect(() => {
     if (session == null) return
-    console.log("session.jwt", session.jwt)
+    session &&
+      (async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/users/me?populate=avatar,city`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.jwt}`,
+              },
+            }
+          )
+          setUserData(response.data)
+        } catch (error) {
+          setError(error.message)
+        } finally {
+          setLoaded(true)
+        }
+      })()
+    //console.log("session.jwt", session)
   }, [session])
-
-  //console.log(comment)
+  //console.log("user", user)
   return (
     <section className="commentSection">
       <div className="flex flex-row items-center justify-between border-b border-midgray">
         <h4 className="font-semibold text-base text-midgray">
-          YORUM YAZIN! (Üye olmadan da yorum yazabilirsiniz)
+          YORUM YAZIN! {session ? "" : "(Üye olmadan da yorum yazabilirsiniz)"}
         </h4>
-        <MdComment className="text-lg text-midgray" />
-      </div>
-      <div className="grid grid-cols-10 gap-1 text-xs mt-1 mb-4">
-        Yorum listesi
-      </div>
-
-      <h1>{session ? "Authenticated" : "Not Authenticated"}</h1>
-      {session && (
-        <div style={{ marginBottom: 10 }}>
-          <h3>Session Data</h3>
-          <div>Email: {session.user.email}</div>
-          <div>JWT from Strapi: Check console</div>
+        <div className="flex gap-2">
+          {session ? (
+            <Menu as="div" className="relative ml-3">
+              {({ open }) => (
+                <>
+                  <div>
+                    <Menu.Button className="flex text-sm text-darkgray hover:text-secondary">
+                      <span className="sr-only">Menü aç</span>
+                      <span className="flex items-center">
+                        {userData?.name || userData?.surname
+                          ? userData?.name + " " + userData?.surname
+                          : userData?.email}
+                        {open ? (
+                          <MdKeyboardArrowUp className="ml-1" />
+                        ) : (
+                          <MdKeyboardArrowDown className="ml-1" />
+                        )}
+                      </span>
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            href="/auth/profile"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Profilim
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            href="/auth/setting"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Ayarlar
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            href="#"
+                            onClick={signOut}
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Çıkış yap
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </>
+              )}
+            </Menu>
+          ) : (
+            <div className="flex gap-1">
+              <Link className="text-secondary" href="/auth/register">
+                Üye Ol
+              </Link>
+              veya
+              <Link className="text-secondary" href="/auth/sign-in">
+                Giriş Yap
+              </Link>
+            </div>
+          )}
+          <MdComment className="text-lg text-midgray" />
         </div>
-      )}
-      {session ? (
-        <button onClick={signOut}>Sign out</button>
+      </div>
+      <CommentForm userData={userData} />
+      {comments.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center border-b border-midgray">
+            <h4 className="font-semibold text-base text-midgray">Yorumlar</h4>
+            <div className="font-semibold text-sm text-primary">
+              {comments.length} yorum
+            </div>
+          </div>
+          <ul className="flex flex-col gap-4">
+            {comments &&
+              comments
+                .filter((comment) => comment.attributes.threadOf.data === null)
+                .map((comment) => {
+                  return (
+                    <li className="" key={comment.id}>
+                      <CommentItem comment={comment} />
+                      <ul className="ml-6">
+                        {comments
+                          .filter(
+                            (subComment) =>
+                              subComment.attributes.threadOf.data?.id ===
+                              comment.id
+                          )
+                          .sort((a, b) => (a.id > b.id ? 1 : -1))
+                          .map((subComment) => {
+                            return (
+                              <li className="my-2" key={subComment.id}>
+                                <CommentItem comment={subComment} />
+                              </li>
+                            )
+                          })}
+                      </ul>
+                    </li>
+                  )
+                })}
+          </ul>
+        </div>
       ) : (
-        <Link href="/auth/sign-in">
-          <a>Sign In</a>
-        </Link>
+        <div className="">İlk yorumu sen ekle</div>
       )}
-      <Link href="/auth/protected">
-        <a
+      {/* <div>
+        {session && (
+          <div style={{ marginBottom: 10 }}>
+            <h3>Session Data</h3>
+            <div>Email: {session.user.email}</div>
+            <div>JWT from Strapi: Check console</div>
+          </div>
+        )}
+        {session ? (
+          <button onClick={signOut}>Sign out</button>
+        ) : (
+          <Link href="/auth/sign-in">Sign In</Link>
+        )}
+        <Link
+          href="/auth/protected"
           style={{
             marginTop: 10,
           }}
         >
           Protected Page
-        </a>
-      </Link>
+        </Link>
+      </div> */}
     </section>
   )
 }

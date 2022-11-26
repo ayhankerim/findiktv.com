@@ -20,23 +20,6 @@ module.exports = ({ env }) => {
                 },
             },
         },
-        comments: {
-            enabled: true,
-            config: {
-                badWords: false,
-                moderatorRoles: ["Authenticated"],
-                approvalFlow: ["api::page.page"],
-                entryLabel: {
-                    "*": ["Title", "title", "Name", "name", "Subject", "subject"],
-                },
-                reportReasons: {
-                    MY_CUSTOM_REASON: "MY_CUSTOM_REASON",
-                },
-                gql: {
-                    // ...
-                },
-            },
-        },
         'email-designer': {
             enabled: true,
 

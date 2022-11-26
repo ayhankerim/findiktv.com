@@ -127,15 +127,6 @@
       "target": "api::product.product",
       "inversedBy": "articles"
     },
-    "comment": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "customField",
-      "customField": "plugin::comments.comments"
-    },
     "featured": {
       "pluginOptions": {
         "i18n": {
@@ -158,6 +149,12 @@
         }
       },
       "type": "integer"
+    },
+    "comments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "article"
     }
   }
 }

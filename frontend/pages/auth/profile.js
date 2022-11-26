@@ -20,6 +20,7 @@ export const getServerSideProps = async (context) => {
   const { locale } = context
   const globalLocale = await getGlobalData(locale)
   const session = await getSession(context)
+  console.log(session)
   // Check if session exists or not, if not, redirect
   if (session == null) {
     return {

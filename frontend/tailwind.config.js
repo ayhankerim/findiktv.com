@@ -1,9 +1,15 @@
 const { colors } = require(`tailwindcss/defaultTheme`)
+const { fontFamily } = require("tailwindcss/defaultTheme")
+/** @type {import('tailwindcss').Config} \*/
 
 module.exports = {
   mode: "jit", // see https://tailwindcss.com/docs/just-in-time-mode
   purge: ["./components/**/*.js", "./pages/**/*.js"],
   darkMode: false, // or "media" or "class"
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -25,6 +31,9 @@ module.exports = {
           DEFAULT: "1rem",
           md: "2rem",
         },
+      },
+      fontFamily: {
+        sans: ["var(--font-dosis)"],
       },
     },
     fontSize: {

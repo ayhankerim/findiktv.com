@@ -6,7 +6,18 @@ import { DefaultSeo } from "next-seo"
 import { getStrapiMedia } from "utils/media"
 import { getGlobalData } from "utils/api"
 import { SessionProvider } from "next-auth/react"
+import { Provider } from "react-redux"
+import { store, persistor } from "@/store/index"
+import { PersistGate } from "redux-persist/integration/react"
+import { Dosis } from "@next/font/google"
+
 import "@/styles/style.css"
+
+const dosis = Dosis({
+  style: ["normal"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-dosis",
+})
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
   // Extract the data we need
@@ -16,41 +27,46 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
   }
 
   const { metadata, favicon, metaTitleSuffix } = global.attributes
-
   return (
     <>
-      <SessionProvider session={session}>
-        {/* Favicon */}
-        <Head>
-          <link
-            rel="shortcut icon"
-            href={getStrapiMedia(favicon.data.attributes.url)}
-          />
-        </Head>
-        {/* Global site metadata */}
-        <DefaultSeo
-          titleTemplate={`%s | ${metaTitleSuffix}`}
-          title="Page"
-          description={metadata.metaDescription}
-          openGraph={{
-            images: Object.values(
-              metadata.shareImage.data.attributes.formats
-            ).map((image) => {
-              return {
-                url: getStrapiMedia(image.url),
-                width: image.width,
-                height: image.height,
-              }
-            }),
-          }}
-          twitter={{
-            cardType: metadata.twitterCardType,
-            handle: metadata.twitterUsername,
-          }}
-        />
-        {/* Display the content */}
-        <Component {...pageProps} />
-      </SessionProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <SessionProvider session={session}>
+            {/* Favicon */}
+            <Head>
+              <link
+                rel="shortcut icon"
+                href={getStrapiMedia(favicon.data.attributes.url)}
+              />
+            </Head>
+            {/* Global site metadata */}
+            <DefaultSeo
+              titleTemplate={`%s | ${metaTitleSuffix}`}
+              title="Page"
+              description={metadata.metaDescription}
+              openGraph={{
+                images: Object.values(
+                  metadata.shareImage.data.attributes.formats
+                ).map((image) => {
+                  return {
+                    url: getStrapiMedia(image.url),
+                    width: image.width,
+                    height: image.height,
+                  }
+                }),
+              }}
+              twitter={{
+                cardType: metadata.twitterCardType,
+                handle: metadata.twitterUsername,
+              }}
+            />
+            {/* Display the content */}
+            <div className={`${dosis.variable} font-sans`}>
+              <Component {...pageProps} />
+            </div>
+          </SessionProvider>
+        </PersistGate>
+      </Provider>
     </>
   )
 }

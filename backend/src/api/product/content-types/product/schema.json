@@ -74,15 +74,6 @@
       "relation": "oneToMany",
       "target": "api::merchant.merchant",
       "mappedBy": "product"
-    },
-    "comment": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "customField",
-      "customField": "plugin::comments.comments"
     }
   }
 }

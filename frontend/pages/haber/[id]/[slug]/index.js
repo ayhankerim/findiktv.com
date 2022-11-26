@@ -3,6 +3,7 @@ import ErrorPage from "next/error"
 import {
   getArticleData,
   getAdsData,
+  getCommentsData,
   fetchAPI,
   getGlobalData,
 } from "@/utils/api"
@@ -93,7 +94,6 @@ const DynamicArticle = ({
       )}</div>${NewsContentText}`,
     }
   }
-  //console.log(JSON.stringify(articleContent.reaction))
   return (
     <Layout
       global={global}
@@ -121,7 +121,7 @@ const DynamicArticle = ({
             slug={articleContext.slug}
             articleId={articleContent.id}
           />
-          <h1 className="font-bold text-xxl">{articleContent.title}</h1>
+          <h1 className="font-extrabold text-xxl">{articleContent.title}</h1>
           <article className="font-semibold text-xl text-darkgray">
             {articleContent.summary}
           </article>
@@ -141,7 +141,7 @@ const DynamicArticle = ({
           <article
             className="text-base"
             dangerouslySetInnerHTML={createFullPostMarkup()}
-            preview={preview}
+            // preview={preview}
           />
           <div
             className="my-4"
@@ -155,10 +155,10 @@ const DynamicArticle = ({
               reactions={articleContent.reaction}
             />
           )}
-          {articleContent.comment && (
+          {articleContent.comments && (
             <ArticleComments
               article={articleContent.id}
-              comment={articleContent.comment}
+              comments={articleContent.comments.data}
             />
           )}
         </div>
@@ -204,7 +204,8 @@ export async function getStaticProps(context) {
 
   const globalLocale = await getGlobalData(locale)
   const advertisement = await getAdsData()
-  //console.log(JSON.stringify(advertisement))
+  const comments = params ? await getCommentsData(params.id) : null
+  //console.log(JSON.stringify(comments))
   // Fetch pages. Include drafts if preview mode is on
   const articleData = await getArticleData({
     slug: params.slug,
@@ -229,7 +230,6 @@ export async function getStaticProps(context) {
     category,
     cities,
     tags,
-    comment,
     reaction,
     metadata,
     localizations,
@@ -247,7 +247,7 @@ export async function getStaticProps(context) {
     category,
     cities,
     tags,
-    comment,
+    comments,
     reaction,
   }
 

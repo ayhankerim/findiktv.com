@@ -65,15 +65,6 @@
       },
       "type": "string",
       "regex": "^$|^[a-zA-Z/-]+$"
-    },
-    "comment": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "customField",
-      "customField": "plugin::comments.comments"
     }
   }
 }

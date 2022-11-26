@@ -21,13 +21,13 @@ const Breadcrumb = ({ parent, current, slug, articleId }) => {
             itemType="http://schema.org/WebPage"
             itemID="/"
           >
-            <Link href={`/`}>
-              <a
-                className="hover:underline underline-offset-4 hover:text-darkgray"
-                itemProp="url"
-              >
-                <span itemProp="name">FINDIK TV</span>
-              </a>
+            <Link
+              href={`/`}
+              passHref
+              className="hover:underline underline-offset-4 hover:text-darkgray"
+              itemProp="url"
+            >
+              <span itemProp="name">FINDIK TV</span>
             </Link>
           </span>
           <MdChevronRight className="inline-block" />
@@ -44,15 +44,15 @@ const Breadcrumb = ({ parent, current, slug, articleId }) => {
             itemType="http://schema.org/WebPage"
             itemID={`/${parent.slug}`}
           >
-            <Link href={`/${parent.slug}`}>
-              <a
-                className="hover:underline underline-offset-4 hover:text-darkgray"
-                itemProp="url"
-              >
-                <span itemProp="name">
-                  {parent.title.toLocaleUpperCase(locale)}
-                </span>
-              </a>
+            <Link
+              href={`/${parent.slug}`}
+              className="hover:underline underline-offset-4 hover:text-darkgray"
+              itemProp="url"
+              passHref
+            >
+              <span itemProp="name">
+                {parent.title.toLocaleUpperCase(locale)}
+              </span>
             </Link>
           </span>
           <MdChevronRight className="inline-block" />

@@ -1,5 +1,6 @@
 import ErrorPage from "next/error"
 import { getPageData, fetchAPI, getAdsData, getGlobalData } from "utils/api"
+import { getSession } from "next-auth/react"
 import Sections from "@/components/sections"
 import Seo from "@/components/elements/seo"
 import { useRouter } from "next/router"
@@ -27,7 +28,7 @@ const DynamicPage = ({
 
   // Loading screen (only possible in preview mode)
   if (router.isFallback) {
-    return <div className="container">Loading...</div>
+    return <div className="container">Yükleniyor...</div>
   }
 
   // Merge default site SEO settings with page specific SEO settings
@@ -38,7 +39,6 @@ const DynamicPage = ({
     ...global.attributes.metadata,
     ...metadata,
   }
-
   return (
     <Layout
       global={global}

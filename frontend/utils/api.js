@@ -344,7 +344,6 @@ export async function getArticleData({ slug, locale, id, preview }) {
                     }
                   }
                 }
-                comment
                 reaction {
                   data {
                     id
@@ -432,6 +431,119 @@ export async function getAdsData(active) {
 
   const advertisement = await adsRes.json()
   return advertisement.data.advertisements.data
+}
+
+export async function getCommentsData(article) {
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const comRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+        query CommentLimited($article: ID!) {
+          comments(
+            filters: { article: { id: { eq: $article } }, and: [{ approvalStatus: { eq: "approved" }}, { removed: { eq: false }}]  }
+            sort: "id:desc"
+            pagination: { start: 0, limit: 100 }
+          ) {
+            data {
+              id
+              attributes {
+                content
+                createdAt
+                updatedAt
+                approvalStatus
+                like
+                dislike
+                blocked
+                blockedThread
+                removed
+                article {
+                  data {
+                    id
+                  }
+                }
+                threadOf {
+                  data {
+                    id
+                  }
+                }
+                reply_to {
+                  data {
+                    id
+                  }
+                }
+                author {
+                  data {
+                    id
+                    attributes {
+                      username
+                      email
+                      name
+                      surname
+                      about
+                      avatar {
+                        ...FileParts
+                      }
+                      city {
+                        data {
+                          id
+                          attributes {
+                            title
+                            slug
+                          }
+                        }
+                      }
+                      confirmed
+                      role {
+                        data {
+                          id
+                          attributes {
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                ip
+              }
+            }
+            meta {
+              pagination {
+                total
+                page
+                pageSize
+                pageCount
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        article,
+      },
+    }),
+  })
+
+  const comment = await comRes.json()
+  return comment.data.comments
 }
 
 export async function createReaction(active) {

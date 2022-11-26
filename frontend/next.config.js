@@ -1,4 +1,7 @@
-module.exports = {
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
     return [
@@ -28,8 +31,15 @@ module.exports = {
   "users-permissions": {
     config: {
       jwt: {
-        expiresIn: "7d",
+        expiresIn: "30d",
       },
     },
   },
+  experimental: {
+    fontLoaders: [
+      { loader: '@next/font/google', options: { subsets: ['latin', 'latin-ext'] } },
+    ],
+  },
 }
+
+module.exports = nextConfig
