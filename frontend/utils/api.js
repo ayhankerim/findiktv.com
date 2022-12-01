@@ -511,6 +511,7 @@ export async function getCommentsData(article) {
                         }
                       }
                       confirmed
+                      blocked
                       role {
                         data {
                           id

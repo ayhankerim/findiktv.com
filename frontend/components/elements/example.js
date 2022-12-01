@@ -7,14 +7,14 @@ export default function MyComponent(comment) {
   const settingsModalOpen = useSelector(
     (state) => state.progress.settingsModalOpen
   )
-  console.log(favouriteNotes)
+  //console.log(favouriteNotes)
   return (
     <>
       <section>
         <ul>
-          {favouriteNotes.map((note) => {
-            ;<li key={note}>{note[comment]}</li>
-          })}
+          {favouriteNotes.map((note, index) => (
+            <li key={index}>{note[comment]}</li>
+          ))}
         </ul>
         <button type="button" onClick={() => dispatch(addFavourite(comment))}>
           Add Favourite

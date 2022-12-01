@@ -1,20 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { getSession } from "next-auth/react"
 
-const initialState = {
-  user: "",
-}
-
-export const userSlice = createSlice({
-  name: "user",
-  initialState,
+const clientSlice = createSlice({
+  name: "client",
+  initialState: {
+    ipAddress: "",
+  },
   reducers: {
-    setUser: (state, props) => {
-      state.user = props.payload
+    getClientIp: (state, action) => {
+      state.ipAddress = action.payload
     },
   },
 })
 
-export const { setUser } = userSlice.actions
+export const { getClientIp } = clientSlice.actions
 
-export default userSlice.reducer
+export default clientSlice

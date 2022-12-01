@@ -12,13 +12,10 @@ const progressSlice = createSlice({
     },
     toggleSettingsModal: (state) => {
       state.settingsModalOpen = !state.settingsModalOpen
-    }
+    },
   },
 })
 
-export const {
-  addFavourite,
-  toggleSettingsModal
-} = progressSlice.actions
+export const { addFavourite, toggleSettingsModal } = progressSlice.actions
 
 export default progressSlice

@@ -3,12 +3,10 @@ import { getGlobalData } from "utils/api"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/router"
 import styles from "@/styles/SignIn.module.css"
-import { useSelector, useDispatch } from "react-redux"
 import { setUser } from "@/store/user"
 
 export default function SignIn() {
   const router = useRouter()
-  const dispatch = useDispatch()
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -19,7 +17,6 @@ export default function SignIn() {
     })
     if (result.ok) {
       router.replace("/")
-      dispatch(setUser("kerim"))
       return
     }
     alert("Credential is not valid")

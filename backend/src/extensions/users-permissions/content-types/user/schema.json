@@ -70,8 +70,7 @@
     },
     "surname": {
       "type": "string",
-      "maxLength": 120,
-      "minLength": 1
+      "maxLength": 120
     },
     "avatar": {
       "type": "media",

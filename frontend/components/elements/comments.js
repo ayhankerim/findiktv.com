@@ -21,8 +21,6 @@ import ProfileCard from "@/components/elements/profile-card"
 import CommentForm from "@/components/elements/comment-form"
 import Tooltip from "@/components/elements/tooltip"
 
-import Example from "./example"
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
@@ -30,7 +28,33 @@ const loader = ({ src, width }) => {
   return getStrapiMedia(src)
 }
 
-const CommentItem = ({ comment }) => {
+const CommentItem = ({ comment, article }) => {
+  const [reply, setReply] = useState(0)
+  const [userData, setUserData] = useState(null)
+  const [loaded, setLoaded] = useState(false)
+  const { data: session } = useSession()
+  useEffect(() => {
+    if (session == null) return
+    session &&
+      (async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/users/me?populate=avatar,city`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.jwt}`,
+              },
+            }
+          )
+          setUserData(response.data)
+        } catch (error) {
+          setError(error.message)
+        } finally {
+          setLoaded(true)
+        }
+      })()
+  }, [session])
+  console.log("comment", comment)
   return (
     <>
       <div className="flex items-start gap-2 border-b pb-2">
@@ -60,7 +84,19 @@ const CommentItem = ({ comment }) => {
         <div className="flex-auto">
           <div className="flex justify-between gap-2 mb-2">
             <div className="flex gap-2">
-              <ProfileCard author={comment.attributes.author.data} />
+              <ProfileCard author={comment.attributes.author.data}>
+                <span
+                  className={`${
+                    comment.attributes.author.data.attributes.blocked
+                      ? "line-through text-danger/50"
+                      : ""
+                  }`}
+                >
+                  {comment.attributes.author.data.attributes.name +
+                    " " +
+                    comment.attributes.author.data.attributes.surname}{" "}
+                </span>
+              </ProfileCard>
               <div
                 className="text-midgray"
                 title={Moment(comment.attributes.createdAt).format("LLLL")}
@@ -148,8 +184,9 @@ const CommentItem = ({ comment }) => {
             }}
           />
           <div className="flex items-center justify-between gap-2 text-midgray">
-            <Link href="#">Yanıtla</Link>
-            <Example comment={comment.id} />
+            <button type="button" onClick={() => setReply(comment.id)}>
+              Yanıtla
+            </button>
             <div className="flex gap-2">
               <Tooltip orientation="bottom" tooltipText="Katılıyorum">
                 <Link
@@ -179,6 +216,23 @@ const CommentItem = ({ comment }) => {
           </div>
         </div>
       </div>
+      {reply === comment.id && (
+        <CommentForm
+          userData={userData}
+          article={article}
+          replyto={comment.attributes.reply_to.data?.id}
+          threadOf={comment.id}
+          commentId={reply}
+        >
+          <button
+            className="w-full border border-midgray hover:border-dark text-midgray hover:text-dark  rounded p-4 mb-4 text-base transition duration-150 ease-out md:ease-in"
+            type="button"
+            onClick={() => setReply(0)}
+          >
+            Vazgeç
+          </button>
+        </CommentForm>
+      )}
     </>
   )
 }
@@ -210,7 +264,7 @@ const Comments = ({ article, comments }) => {
       })()
     //console.log("session.jwt", session)
   }, [session])
-  //console.log("user", user)
+  console.log("article", article)
   return (
     <section className="commentSection">
       <div className="flex flex-row items-center justify-between border-b border-midgray">
@@ -306,12 +360,12 @@ const Comments = ({ article, comments }) => {
           <MdComment className="text-lg text-midgray" />
         </div>
       </div>
-      <CommentForm userData={userData} />
+      <CommentForm userData={userData} article={article} commentId="0" />
       {comments.length > 0 ? (
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center border-b border-midgray">
             <h4 className="font-semibold text-base text-midgray">Yorumlar</h4>
-            <div className="font-semibold text-sm text-primary">
+            <div className="font-semibold text-sm text-midgray">
               {comments.length} yorum
             </div>
           </div>
@@ -322,23 +376,31 @@ const Comments = ({ article, comments }) => {
                 .map((comment) => {
                   return (
                     <li className="" key={comment.id}>
-                      <CommentItem comment={comment} />
-                      <ul className="ml-6">
-                        {comments
-                          .filter(
-                            (subComment) =>
-                              subComment.attributes.threadOf.data?.id ===
-                              comment.id
-                          )
-                          .sort((a, b) => (a.id > b.id ? 1 : -1))
-                          .map((subComment) => {
-                            return (
-                              <li className="my-2" key={subComment.id}>
-                                <CommentItem comment={subComment} />
-                              </li>
+                      <CommentItem comment={comment} article={article} />
+                      {comments.filter(
+                        (subComment) =>
+                          subComment.attributes.threadOf.data?.id === comment.id
+                      ).length > 0 && (
+                        <ul className="ml-6">
+                          {comments
+                            .filter(
+                              (subComment) =>
+                                subComment.attributes.threadOf.data?.id ===
+                                comment.id
                             )
-                          })}
-                      </ul>
+                            .sort((a, b) => (a.id > b.id ? 1 : -1))
+                            .map((subComment) => {
+                              return (
+                                <li className="my-2" key={subComment.id}>
+                                  <CommentItem
+                                    comment={subComment}
+                                    article={article}
+                                  />
+                                </li>
+                              )
+                            })}
+                        </ul>
+                      )}
                     </li>
                   )
                 })}

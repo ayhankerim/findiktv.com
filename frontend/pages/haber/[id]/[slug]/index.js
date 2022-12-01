@@ -33,7 +33,6 @@ const DynamicArticle = ({
   articleContext,
 }) => {
   const router = useRouter()
-
   // Check if the required data was provided
   if (!router.isFallback && !articleContent.content?.length) {
     return <ErrorPage statusCode={404} />
@@ -94,6 +93,8 @@ const DynamicArticle = ({
       )}</div>${NewsContentText}`,
     }
   }
+  //dispatch(visitedArticle({ id: articleContent.id }))
+  //console.log("articleContent", articleContent.id)
   return (
     <Layout
       global={global}
@@ -162,7 +163,7 @@ const DynamicArticle = ({
             />
           )}
         </div>
-        <aside className="flex-none w-[336px]">01</aside>
+        <aside className="flex-none w-[336px]">Sidebar</aside>
       </main>
     </Layout>
   )
@@ -273,7 +274,7 @@ export async function getStaticProps(context) {
         localizedPaths,
       },
     },
-    revalidate: 15,
+    revalidate: 60,
   }
 }
 

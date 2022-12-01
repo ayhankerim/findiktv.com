@@ -19,7 +19,7 @@ const loader = ({ src, width }) => {
   return getStrapiMedia(src)
 }
 
-export default function ProfileCard({ author }) {
+export default function ProfileCard({ children, author }) {
   const [total, setTotal] = useState(0)
   let timeout
   const timeoutDuration = 400
@@ -33,6 +33,9 @@ export default function ProfileCard({ author }) {
   }
 
   const onHover = (open, action) => {
+    fetchAPI(
+      `/comments?populate=author&filters[author][id][$eq]=${author.id}`
+    ).then((data) => setTotal(data.meta.pagination.total))
     if (
       (!open && !openState && action === "onMouseEnter") ||
       (open && openState && action === "onMouseLeave")
@@ -47,9 +50,6 @@ export default function ProfileCard({ author }) {
     }
   }
   useEffect(() => {
-    fetchAPI(
-      `/comments?populate=author&filters[author][id][$eq]=${author.id}`
-    ).then((data) => setTotal(data.meta.pagination.total))
     document.addEventListener("mousedown", handleClickOutside)
 
     return () => {
@@ -73,13 +73,13 @@ export default function ProfileCard({ author }) {
                 ${open ? "" : "text-opacity-90"}
                 flex items-center font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                 >
-                  <span>
-                    {author.attributes.name + " " + author.attributes.surname}{" "}
-                  </span>
+                  {children}
                   {open ? (
                     <MdClose className="ml-2 text-midgray" />
-                  ) : (
+                  ) : author.attributes.blocked != true ? (
                     <FcApproval className="ml-2" />
+                  ) : (
+                    ""
                   )}
                 </Popover.Button>
                 <Transition
@@ -95,15 +95,19 @@ export default function ProfileCard({ author }) {
                   <Popover.Panel className="absolute z-10 inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-80 dark:text-gray-400 dark:bg-gray-800 dark:border-gray-600 shadow-lg">
                     <div className="p-3">
                       <div className="flex">
-                        <div>
+                        <div className="w-full">
                           <p className="mb-1 text-base font-semibold leading-none text-gray-900 dark:text-white">
                             {author.attributes.name +
                               " " +
                               author.attributes.surname}
                           </p>
                           <p className="flex items-center gap-1 mb-3 text-sm font-normal">
-                            {author.attributes.city.data.attributes.title}
-                            <BsDot />
+                            {author.attributes.city.data && (
+                              <>
+                                {author.attributes.city.data.attributes.title}
+                                <BsDot />
+                              </>
+                            )}
                             <span>
                               {(() => {
                                 switch (author.attributes.role.data.id) {
