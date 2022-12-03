@@ -110,8 +110,6 @@ export const badwords = [
   "anas\u0131 orospu",
   "anasi",
   "anasinin",
-  "anay",
-  "anayin",
   "angut",
   "anneni",
   "annenin",

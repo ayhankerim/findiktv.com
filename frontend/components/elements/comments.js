@@ -1,5 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react"
 import { signOut, useSession } from "next-auth/react"
+import { useSelector, useDispatch } from "react-redux"
+import { pointComment } from "@/store/comment"
 import Link from "next/link"
 import { Menu, Transition } from "@headlessui/react"
 import axios from "axios"
@@ -16,6 +18,7 @@ import {
   MdThumbUp,
   MdThumbDown,
 } from "react-icons/md"
+import { RiShareForwardFill } from "react-icons/ri"
 import { TbDots } from "react-icons/tb"
 import ProfileCard from "@/components/elements/profile-card"
 import CommentForm from "@/components/elements/comment-form"
@@ -33,6 +36,13 @@ const CommentItem = ({ comment, article }) => {
   const [userData, setUserData] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const { data: session } = useSession()
+  const dispatch = useDispatch()
+  const pointedComment = useSelector((state) => state.comment.pointedComment)
+  function scrolltoComment(id) {
+    document.querySelector("#comment-" + id).scrollIntoView({
+      behavior: "smooth",
+    })
+  }
   useEffect(() => {
     if (session == null) return
     session &&
@@ -54,10 +64,15 @@ const CommentItem = ({ comment, article }) => {
         }
       })()
   }, [session])
-  console.log("comment", comment)
+  //console.log("comment", comment)
   return (
     <>
-      <div className="flex items-start gap-2 border-b pb-2">
+      <div
+        id={`comment-${comment.id}`}
+        className={`flex items-start gap-2 border-b pb-2  transition duration-400 ease-in ease-out ${
+          pointedComment === comment.id ? "bg-point/40" : ""
+        }`}
+      >
         <div className="flex-none w-[55px] h-[55px] relative">
           {comment.attributes.author.data.attributes.avatar.data ? (
             <Image
@@ -103,6 +118,37 @@ const CommentItem = ({ comment, article }) => {
               >
                 {Moment(comment.attributes.createdAt).fromNow(true)} önce
               </div>
+              {comment.attributes.threadOf.data &&
+                comment.attributes.threadOf.data?.id !=
+                  comment.attributes.reply_to.data?.id && (
+                  <div className="flex items-center text-midgray gap-1">
+                    <RiShareForwardFill />{" "}
+                    <i>
+                      {
+                        comment.attributes.reply_to.data.attributes.author.data
+                          .attributes.name
+                      }{" "}
+                      {
+                        comment.attributes.reply_to.data.attributes.author.data
+                          .attributes.surname
+                      }{" "}
+                    </i>
+                    tarafından yapılan
+                    <button
+                      className="underline"
+                      onClick={() => {
+                        scrolltoComment(comment.attributes.reply_to.data.id)
+                        dispatch(
+                          pointComment(comment.attributes.reply_to.data.id)
+                        )
+                        setTimeout(() => dispatch(pointComment(0)), 3000)
+                      }}
+                    >
+                      yoruma
+                    </button>{" "}
+                    cevaben
+                  </div>
+                )}
             </div>
             <div className="">
               <Menu as="div" className="relative ml-3">
@@ -178,14 +224,17 @@ const CommentItem = ({ comment, article }) => {
             </div>
           </div>
           <div
-            className="text-darkgray mb-1"
+            className="text-darkgray text-base mb-1"
             dangerouslySetInnerHTML={{
               __html: comment.attributes.content,
             }}
           />
           <div className="flex items-center justify-between gap-2 text-midgray">
-            <button type="button" onClick={() => setReply(comment.id)}>
-              Yanıtla
+            <button
+              type="button"
+              onClick={() => setReply(reply === 0 ? comment.id : 0)}
+            >
+              {reply === 0 ? "Yanıtla" : "Vazgeç"}
             </button>
             <div className="flex gap-2">
               <Tooltip orientation="bottom" tooltipText="Katılıyorum">
@@ -220,8 +269,12 @@ const CommentItem = ({ comment, article }) => {
         <CommentForm
           userData={userData}
           article={article}
-          replyto={comment.attributes.reply_to.data?.id}
-          threadOf={comment.id}
+          replyto={comment.id}
+          threadOf={
+            comment.attributes.threadOf.data
+              ? comment.attributes.threadOf.data.id
+              : comment.id
+          }
           commentId={reply}
         >
           <button
@@ -262,9 +315,7 @@ const Comments = ({ article, comments }) => {
           setLoaded(true)
         }
       })()
-    //console.log("session.jwt", session)
   }, [session])
-  console.log("article", article)
   return (
     <section className="commentSection">
       <div className="flex flex-row items-center justify-between border-b border-midgray">
@@ -381,7 +432,7 @@ const Comments = ({ article, comments }) => {
                         (subComment) =>
                           subComment.attributes.threadOf.data?.id === comment.id
                       ).length > 0 && (
-                        <ul className="ml-6">
+                        <ul className="ml-10">
                           {comments
                             .filter(
                               (subComment) =>
@@ -391,7 +442,7 @@ const Comments = ({ article, comments }) => {
                             .sort((a, b) => (a.id > b.id ? 1 : -1))
                             .map((subComment) => {
                               return (
-                                <li className="my-2" key={subComment.id}>
+                                <li className={`my-2`} key={subComment.id}>
                                   <CommentItem
                                     comment={subComment}
                                     article={article}
@@ -409,28 +460,6 @@ const Comments = ({ article, comments }) => {
       ) : (
         <div className="">İlk yorumu sen ekle</div>
       )}
-      {/* <div>
-        {session && (
-          <div style={{ marginBottom: 10 }}>
-            <h3>Session Data</h3>
-            <div>Email: {session.user.email}</div>
-            <div>JWT from Strapi: Check console</div>
-          </div>
-        )}
-        {session ? (
-          <button onClick={signOut}>Sign out</button>
-        ) : (
-          <Link href="/auth/sign-in">Sign In</Link>
-        )}
-        <Link
-          href="/auth/protected"
-          style={{
-            marginTop: 10,
-          }}
-        >
-          Protected Page
-        </Link>
-      </div> */}
     </section>
   )
 }

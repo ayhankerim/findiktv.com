@@ -163,7 +163,7 @@ const DynamicArticle = ({
             />
           )}
         </div>
-        <aside className="flex-none w-[336px]">Sidebar</aside>
+        <aside className="sticky top-0 flex-none w-[336px]">Sidebar</aside>
       </main>
     </Layout>
   )

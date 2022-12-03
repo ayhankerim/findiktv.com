@@ -487,6 +487,17 @@ export async function getCommentsData(article) {
                 reply_to {
                   data {
                     id
+                    attributes {
+                      author {
+                        data {
+                          id
+                          attributes {
+                            name
+                            surname
+                          }
+                        }
+                      }
+                    }
                   }
                 }
                 author {

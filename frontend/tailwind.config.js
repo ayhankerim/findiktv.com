@@ -24,6 +24,7 @@ module.exports = {
         success: "#73C322",
         info: "#6494fd",
         youtube: "#FF0000",
+        point: "rgb(255,255,84)",
       },
       container: {
         center: true,
@@ -37,10 +38,10 @@ module.exports = {
       },
     },
     fontSize: {
-      xs: "15px",
-      sm: "18px",
-      base: "24px",
-      lg: "28px",
+      xs: "13px",
+      sm: "16px",
+      base: "20px",
+      lg: "25px",
       xl: "32px",
       xxl: "45px",
     },
