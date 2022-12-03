@@ -31,6 +31,21 @@ const loader = ({ src, width }) => {
   return getStrapiMedia(src)
 }
 
+let commentReactions = [
+  {
+    id: "like",
+    title: "Katılıyorum",
+    icon: <MdThumbUp />,
+    class: "text-success",
+  },
+  {
+    id: "dislike",
+    title: "Katılmıyorum",
+    icon: <MdThumbDown />,
+    class: "text-danger",
+  },
+]
+
 const CommentItem = ({ comment, article }) => {
   const [reply, setReply] = useState(0)
   const [userData, setUserData] = useState(null)
@@ -237,30 +252,22 @@ const CommentItem = ({ comment, article }) => {
               {reply === 0 ? "Yanıtla" : "Vazgeç"}
             </button>
             <div className="flex gap-2">
-              <Tooltip orientation="bottom" tooltipText="Katılıyorum">
-                <Link
-                  href="/"
-                  passHref
-                  className="flex justify-between items-center gap-2 py-1 px-2 border rounded hover:text-dark"
-                >
-                  <MdThumbUp />
-                  <span className="text-success">
-                    {comment.attributes.like}
-                  </span>
-                </Link>
-              </Tooltip>
-              <Tooltip orientation="bottom" tooltipText="Katılmıyorum">
-                <Link
-                  href="/"
-                  passHref
-                  className="flex justify-between items-center gap-2 py-1 px-2 border rounded hover:text-dark"
-                >
-                  <MdThumbDown />
-                  <span className="text-danger">
-                    {comment.attributes.dislike}
-                  </span>
-                </Link>
-              </Tooltip>
+              {commentReactions.map((item) => {
+                return (
+                  <Tooltip
+                    key={item.id}
+                    orientation="bottom"
+                    tooltipText={item.title}
+                  >
+                    <button className="flex justify-between items-center gap-2 py-1 px-2 border rounded hover:text-dark">
+                      {item.icon}
+                      <span className={item.class}>
+                        {comment.attributes[item.id]}
+                      </span>
+                    </button>
+                  </Tooltip>
+                )
+              })}
             </div>
           </div>
         </div>
