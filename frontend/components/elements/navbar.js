@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import Link from "next/link"
+import axios from "axios"
 import { useRouter } from "next/router"
 import { signOut, useSession } from "next-auth/react"
+import { useSelector, useDispatch } from "react-redux"
+import { updateUser } from "@/store/user"
 import { getButtonAppearance } from "utils/button"
 import { mediaPropTypes, linkPropTypes, buttonLinkPropTypes } from "utils/types"
 import {
@@ -24,12 +27,38 @@ import Advertisement from "@/components/elements/advertisement"
 const Navbar = ({ navbar, pageContext, advertisement }) => {
   const router = useRouter()
   const { data: session } = useSession()
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState([])
+  const dispatch = useDispatch()
+  const userData = useSelector((state) => state.user.userData)
   const [mobileMenuIsShown, setMobileMenuIsShown] = useState(false)
 
   useEffect(() => {
-    if (session == null) return
-    //console.log("session.jwt", session.jwt)
-  }, [session])
+    if (session === null) {
+      dispatch(updateUser({}))
+      return
+    }
+    userData &&
+      Object.entries(userData).length === 0 &&
+      (async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/users/me?populate=avatar,city`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.jwt}`,
+              },
+            }
+          )
+          dispatch(updateUser(response.data))
+        } catch (error) {
+          setError(error.message)
+        } finally {
+          setLoaded(true)
+        }
+      })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, session])
 
   return (
     <>

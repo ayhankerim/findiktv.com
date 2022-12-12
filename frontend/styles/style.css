@@ -9,7 +9,7 @@ html {
   scroll-behavior: smooth;
 }
 
-article h2 {
+article.NewsContent h2 {
   @apply text-xl;
   @apply font-bold;
   @apply text-dark;
@@ -17,26 +17,26 @@ article h2 {
   padding-bottom: 10px;
 }
 
-article p {
+article.NewsContent p {
   padding-bottom: 10px;
   @apply font-light;
 }
-article a {
+article.NewsContent a {
   @apply font-bold;
   @apply text-secondary;
   @apply underline;
 }
-article a:hover {
+article.NewsContent a:hover {
   @apply text-dark;
   @apply no-underline;
 }
-article .adsInline .band {
+article.NewsContent .adsInline .band {
     position: relative;
     display: flex;
     height: 1.6rem;
     margin-bottom: 1rem;
 }
-article .adsInline .band span {
+article.NewsContent .adsInline .band span {
     position: relative;
     flex: 1;
     @apply text-sm;
@@ -46,7 +46,7 @@ article .adsInline .band span {
     padding: 0 1rem;
     z-index: 1;
 }
-article .adsInline .band:before, article .adsInline .band:after {
+article.NewsContent .adsInline .band:before, article.NewsContent .adsInline .band:after {
     content: "";
     flex: 2;
     margin: .7rem auto;

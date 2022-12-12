@@ -1,37 +1,25 @@
-import React, { useState, useEffect, Fragment } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { signOut, useSession } from "next-auth/react"
+import useSWR, { useSWRConfig } from "swr"
 import { fetchAPI } from "utils/api"
 import * as yup from "yup"
 import { Formik, Form, Field } from "formik"
-import "react-quill/dist/quill.snow.css"
+import toast, { Toaster } from "react-hot-toast"
 import Dialog from "@/components/elements/dialog"
 import { badwords } from "@/utils/badwords"
 import { Transition } from "@headlessui/react"
+import { BiLoaderCircle } from "react-icons/bi"
 
-const ReactQuill =
-  typeof window === "object" ? require("react-quill") : () => false
-
-const modules = {
-  toolbar: [
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
-  clipboard: {
-    matchVisual: false,
-  },
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ")
 }
-const formats = [
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "link",
-]
+const notify = (type, message) => {
+  if (type === "success") {
+    toast.success(message)
+  } else if (type === "error") {
+    toast.error(message)
+  }
+}
 
 export default function CommentForm({
   userData,
@@ -39,6 +27,7 @@ export default function CommentForm({
   replyto,
   threadOf,
   commentId,
+  onNewComment = "",
   children,
 }) {
   const [loading, setLoading] = useState(false)
@@ -166,6 +155,7 @@ export default function CommentForm({
   }, [])
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       <Formik
         initialValues={{
           content: "",
@@ -177,7 +167,7 @@ export default function CommentForm({
         enableReinitialize
         validationSchema={session ? loggedInSchema : notloggedInSchema}
         //validateOnChange={false}
-        onSubmit={async (values, { setSubmitting, setErrors }) => {
+        onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
           setLoading(true)
           if (session) {
             try {
@@ -199,8 +189,15 @@ export default function CommentForm({
                   }),
                 }
               )
-              alert("oldu")
+              notify("success", "Yorumunuz eklendi.")
+              resetForm({
+                values: {
+                  content: "",
+                },
+              })
+              onNewComment()
             } catch (err) {
+              console.error(err)
               setErrors({ api: err.message })
             }
           } else {
@@ -271,11 +268,15 @@ export default function CommentForm({
                   })
                 }
               })
-              alert("oldu")
+              notify("success", "Yorumunuz eklendi.")
+              resetForm({
+                values: {
+                  content: "",
+                },
+              })
+              onNewComment()
             } catch (err) {
               setErrors({ api: err.message })
-            } finally {
-              console.log("error", error)
             }
           }
 
@@ -283,47 +284,27 @@ export default function CommentForm({
           setSubmitting(false)
         }}
       >
-        {({
-          errors,
-          touched,
-          isSubmitting,
-          validateField,
-          setFieldValue,
-          setFieldTouched,
-        }) => (
+        {({ errors, touched, isSubmitting, setFieldValue }) => (
           <div className={`commentId${commentId}`}>
             <Form className="flex flex-col gap-4">
               <div className="flex flex-col gap-2 mt-2">
-                <ReactQuill
+                <Field
+                  component="textarea"
                   name="content"
-                  modules={modules}
-                  formats={formats}
                   placeholder="Yorumunuz..."
-                  onChange={(value) => {
-                    setFieldValue("content", value)
-                    setFieldTouched("content", true)
+                  rows={3}
+                  onClick={() => {
                     setIsShowing(true)
                   }}
-                  //onChange={setValue}
-                  theme="snow"
+                  className={classNames(
+                    errors.content && touched.content
+                      ? "border-danger"
+                      : "border-midgray",
+                    "text-base focus:outline-none p-2 border"
+                  )}
                 />
                 {errors.content && (
                   <>
-                    <style jsx global>{`
-                      .commentSection
-                        .commentId${commentId}
-                        .ql-toolbar.ql-snow,
-                      .commentSection
-                        .commentId${commentId}
-                        .ql-container.ql-snow {
-                        border-color: rgba(
-                          212,
-                          17,
-                          27,
-                          var(--tw-border-opacity)
-                        );
-                      }
-                    `}</style>
                     <p className="text-danger">{errors.content}</p>
                   </>
                 )}
@@ -332,25 +313,27 @@ export default function CommentForm({
                 show={isShowing}
                 enter="transition ease-out duration-100"
                 enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
+                enterTo=""
                 leave="transition ease-in duration-75"
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
                 <div className="flex flex-col w-3/3 gap-2 mb-2">
                   <div
-                    className={`flex flex-row items-center ${
-                      errors.term && touched.term ? "text-danger" : ""
-                    }`}
+                    className={classNames(
+                      errors.term && touched.term ? "text-danger" : "",
+                      "flex flex-row items-center"
+                    )}
                   >
                     <Field
                       type="checkbox"
                       name="term"
-                      className={`h-4 w-4 mr-2 text-midgray rounded ${
+                      className={classNames(
                         errors.term && touched.term
                           ? "border-gray"
-                          : "border-danger"
-                      }`}
+                          : "border-danger",
+                        "h-4 w-4 mr-2 text-midgray rounded"
+                      )}
                     />
                     <Dialog
                       title={"Yorum Yazma Kuralları"}
@@ -358,23 +341,7 @@ export default function CommentForm({
                         "Üye/Üyeler suç teşkil edecek, yasal açıdan takip gerektirecek, yasaların ya da uluslararası anlaşmaların ihlali sonucunu doğuran ya da böyle durumları teşvik eden, yasadışı, tehditkar, rahatsız edici, hakaret ve küfür içeren, aşağılayıcı, küçük düşürücü, kaba, pornografik ya da ahlaka aykırı, toplumca genel kabul görmüş kurallara aykırı, kişilik haklarına zarar verici ya da benzeri niteliklerde hiçbir İçeriği bu web sitesinin hiçbir sayfasında ya da subdomain olarak oluşturulan diğer sayfalarında paylaşamaz. Bu tür içeriklerden doğan her türlü mali, hukuki, cezai, idari sorumluluk münhasıran, içeriği gönderen Üye/Üyeler’e aittir. FINDIK TV, Üye/Üyeler tarafından paylaşılan içerikler arasından uygun görmediklerini herhangi bir gerekçe belirtmeksizin kendi web sayfalarında yayınlamama veya yayından kaldırma hakkına sahiptir. FINDIK TV, başta yukarıda sayılan hususlar olmak üzere emredici kanun hükümlerine aykırılık gerekçesi ile her türlü adli makam tarafından başlatılan soruşturma kapsamında kendisinden Ceza Muhakemesi Kanunu’nun 332.maddesi doğrultusunda istenilen Üye/Üyeler’e ait kişisel bilgileri paylaşabileceğini beyan eder. "
                       }
                       onConfirm={() => setFieldValue("term", true)}
-                      //onDiscard={() => console.log("Button discard")}
                       buttons={[
-                        // {
-                        //   role: "custom",
-                        //   onClick: () => console.log("custom test"),
-                        //   toClose: true,
-                        //   classes:
-                        //     "bg-zinc-500/20 px-4 py-2 rounded-lg hover:bg-zinc-500/30 transition-all duration-200",
-                        //   label: "Custom",
-                        // },
-                        // {
-                        //   role: "discard",
-                        //   toClose: true,
-                        //   classes:
-                        //     "bg-zinc-500/20 px-4 py-2 rounded-lg hover:bg-zinc-500/30 transition-all duration-200",
-                        //   label: "Discard",
-                        // },
                         {
                           role: "confirm",
                           toClose: true,
@@ -390,24 +357,20 @@ export default function CommentForm({
                       >
                         Yorum yazma kurallarını
                       </button>
+                      <span>okudum ve kabul ediyorum.</span>
                     </Dialog>
-                    <span>okudum ve kabul ediyorum.</span>
                   </div>
-                  {/* {errors.term && touched.term && (
-                  <p className="text-red-500 h-12 text-sm mt-1 ml-2 text-left">
-                    {errors.term}
-                  </p>
-                )} */}
                 </div>
                 {!session && (
                   <div className="grid grid-cols-2 gap-2 mb-2">
                     <div className="flex flex-col gap-2">
                       <Field
-                        className={`text-base focus:outline-none py-4 md:py-0 px-4 border ${
+                        className={classNames(
                           errors.name && touched.name
                             ? "border-danger"
-                            : "border-midgray"
-                        }`}
+                            : "border-midgray",
+                          "text-base focus:outline-none py-1 px-2 border"
+                        )}
                         type="text"
                         name="name"
                         placeholder="Adınız *"
@@ -418,7 +381,12 @@ export default function CommentForm({
                     </div>
                     <div className="flex flex-col gap-2">
                       <Field
-                        className="text-base focus:outline-none py-4 md:py-0 px-4 border border-midgray"
+                        className={classNames(
+                          errors.surname && touched.surname
+                            ? "border-danger"
+                            : "border-midgray",
+                          "text-base focus:outline-none py-1 px-2 border"
+                        )}
                         type="text"
                         name="surname"
                         placeholder="Soyadınız"
@@ -429,11 +397,12 @@ export default function CommentForm({
                     </div>
                     <div className="flex flex-col gap-2">
                       <Field
-                        className={`text-base focus:outline-none py-4 md:py-0 px-4 border ${
+                        className={classNames(
                           errors.email && touched.email
                             ? "border-danger"
-                            : "border-midgray"
-                        }`}
+                            : "border-midgray",
+                          "text-base focus:outline-none py-1 px-2 border"
+                        )}
                         type="email"
                         name="email"
                         placeholder="E-Posta *"
@@ -451,11 +420,12 @@ export default function CommentForm({
                       <div className="flex flex-col gap-2">
                         <div className="flex flex-col">
                           <Field
-                            className={`text-base focus:outline-none py-4 md:py-0 px-4 border ${
+                            className={classNames(
                               errors.password && touched.password
                                 ? "border-danger"
-                                : "border-midgray"
-                            }`}
+                                : "border-midgray",
+                              "text-base focus:outline-none py-1 px-2 border"
+                            )}
                             type="password"
                             name="password"
                             placeholder="Şifre"
@@ -479,11 +449,19 @@ export default function CommentForm({
                 <div className="flex flex-row gap-2">
                   {children}
                   <button
-                    className="w-full bg-secondary hover:bg-secondary/90 text-white rounded p-4 mb-4 text-base transition duration-150 ease-out md:ease-in"
+                    className="disabled:opacity-75 w-full bg-secondary hover:bg-secondary/90 text-white rounded p-4 text-base transition duration-150 ease-out md:ease-in"
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={loading}
                   >
-                    Gönder
+                    {loading ? (
+                      <span role="status">
+                        <BiLoaderCircle className="mr-2 inline-block align-middle w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
+                        <span class="sr-only">Gönderiliyor...</span>
+                        <span>Gönderiliyor...</span>
+                      </span>
+                    ) : (
+                      <span>Gönder</span>
+                    )}
                   </button>
                 </div>
               </Transition>

@@ -12,8 +12,8 @@ export default function ViewCounter({ slug, blogPage = false }) {
   const views = new Number(data?.total)
 
   useEffect(() => {
-    const registerView = () =>
-      fetch(`/api/views/${slug}`, {
+    const registerView = async () =>
+      await fetch(`/api/views/${slug}`, {
         method: "POST",
       })
 
@@ -24,10 +24,10 @@ export default function ViewCounter({ slug, blogPage = false }) {
 
   return (
     <>
-      <span className="text-xs text-midgray">
+      <div className="text-xs text-midgray">
         <MdOutlineRemoveRedEye className="inline-block" />
         {views > 0 ? views.toLocaleString() : "–––"} gösterim
-      </span>
+      </div>
     </>
   )
 }

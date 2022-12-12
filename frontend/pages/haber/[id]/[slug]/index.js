@@ -3,7 +3,7 @@ import ErrorPage from "next/error"
 import {
   getArticleData,
   getAdsData,
-  getCommentsData,
+  //getCommentsData,
   fetchAPI,
   getGlobalData,
 } from "@/utils/api"
@@ -15,7 +15,7 @@ import ArticleDates from "@/components/elements/date"
 import ViewCounter from "@/components/elements/pageviews"
 import ArticleShare from "@/components/elements/share"
 import ArticleReactions from "@/components/elements/reactions"
-import ArticleComments from "@/components/elements/comments"
+import ArticleComments from "@/components/elements/comments/comments"
 import { useRouter } from "next/router"
 import Layout from "@/components/layout"
 import { getLocalizedPaths } from "@/utils/localize"
@@ -136,11 +136,10 @@ const DynamicArticle = ({
           <ArticleShare
             position="articleTop"
             title={articleContent.title}
-            slug={`${process.env.NEXT_PUBLIC_SITE_URL}/${articleContent.id}/${articleContext.slug}`}
-            commentCount={0}
+            slug={`${process.env.NEXT_PUBLIC_SITE_URL}/haber/${articleContent.id}/${articleContext.slug}`}
           />
           <article
-            className="text-base"
+            className="NewsContent text-base"
             dangerouslySetInnerHTML={createFullPostMarkup()}
             // preview={preview}
           />
@@ -156,12 +155,11 @@ const DynamicArticle = ({
               reactions={articleContent.reaction}
             />
           )}
-          {articleContent.comments && (
-            <ArticleComments
-              article={articleContent.id}
-              comments={articleContent.comments.data}
-            />
-          )}
+          <ArticleComments
+            article={articleContent.id}
+            slug={`${process.env.NEXT_PUBLIC_SITE_URL}/haber/${articleContent.id}/${articleContext.slug}`}
+            infinite={false}
+          />
         </div>
         <aside className="sticky top-0 flex-none w-[336px]">Sidebar</aside>
       </main>
@@ -205,7 +203,7 @@ export async function getStaticProps(context) {
 
   const globalLocale = await getGlobalData(locale)
   const advertisement = await getAdsData()
-  const comments = params ? await getCommentsData(params.id) : null
+  //const comments = params ? await getCommentsData(params.id) : null
   //console.log(JSON.stringify(comments))
   // Fetch pages. Include drafts if preview mode is on
   const articleData = await getArticleData({
@@ -248,7 +246,7 @@ export async function getStaticProps(context) {
     category,
     cities,
     tags,
-    comments,
+    //comments,
     reaction,
   }
 

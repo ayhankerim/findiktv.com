@@ -12,6 +12,7 @@ import {
 } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import progressSlice from "./progress"
+import userSlice from "./user"
 import commentSlice from "./comment"
 
 const persistConfig = {
@@ -23,6 +24,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   progress: progressSlice.reducer,
+  user: userSlice.reducer,
   comment: commentSlice.reducer,
 })
 

@@ -35,7 +35,9 @@ export async function fetchAPI(path, urlParamsObject = {}, options = {}) {
   // Handle response
   if (!response.ok) {
     console.error(response.statusText)
-    throw new Error(`An error occured please try again`)
+    throw new Error(
+      `Bilinmeyen bir hata ile karşılaştık. Lütfen daha sonra tekrar deneyin!`
+    )
   }
   const data = await response.json()
   return data
@@ -471,7 +473,6 @@ export async function getCommentsData(article) {
                 approvalStatus
                 like
                 dislike
-                blocked
                 blockedThread
                 removed
                 article {

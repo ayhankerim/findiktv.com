@@ -1,4 +1,5 @@
 import React from "react"
+import { useSelector } from "react-redux"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import {
@@ -10,7 +11,8 @@ import {
 } from "react-icons/fa"
 import { SiGooglenews } from "react-icons/si"
 
-const ArticleDates = ({ position, title, slug, commentCount }) => {
+const ArticleDates = ({ position, title, slug }) => {
+  const countedComment = useSelector((state) => state.comment.countedComment)
   const { locale } = useRouter()
   function scrolltoComments() {
     document.querySelector(".commentSection").scrollIntoView({
@@ -82,7 +84,7 @@ const ArticleDates = ({ position, title, slug, commentCount }) => {
               className="flex flex-row items-center text-xs hover:bg-[#ff9d00] text-[#ff9d00] hover:text-white border border-[#ff9d00] transition duration-150 ease-out hover:ease-in px-2 py-1 rounded"
             >
               <FaComment className="inline-flex text-base mr-2" />
-              <span>{commentCount}</span>
+              <span>{countedComment}</span>
             </button>
           </div>
           <div className="flex flex-row items-center gap-2 text-midgray">

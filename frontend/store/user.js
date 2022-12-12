@@ -1,17 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const clientSlice = createSlice({
-  name: "client",
+const userSlice = createSlice({
+  name: "user",
   initialState: {
-    ipAddress: "",
+    userData: {},
   },
   reducers: {
-    getClientIp: (state, action) => {
-      state.ipAddress = action.payload
+    updateUser: (state, action) => {
+      state.userData = action.payload
     },
   },
 })
 
-export const { getClientIp } = clientSlice.actions
+export const { updateUser } = userSlice.actions
 
-export default clientSlice
+export default userSlice

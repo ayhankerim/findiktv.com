@@ -150,14 +150,12 @@ const Reactions = ({ article, reactions }) => {
                   }}
                 >
                   <Image
-                    loader={loader}
                     layout="responsive"
                     width="72"
                     height="72"
                     objectFit="contain"
                     src={emoji.image}
                     alt={emoji.title}
-                    unoptimized={true}
                   />
                 </button>
               </Tooltip>

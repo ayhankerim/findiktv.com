@@ -14,10 +14,10 @@ const NextImage = ({ media, ...props }) => {
   if (props.width && props.height) {
     return (
       <Image
-        loader={loader}
+        //loader={loader}
         src={url}
         alt={alternativeText || ""}
-        unoptimized={true}
+        unoptimized={false}
         {...props}
       />
     )
@@ -26,7 +26,7 @@ const NextImage = ({ media, ...props }) => {
   // The image is responsive
   return (
     <Image
-      loader={loader}
+      //loader={loader}
       layout="responsive"
       width={width || "100%"}
       height={height || "100%"}
