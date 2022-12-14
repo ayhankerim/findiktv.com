@@ -1,8 +1,11 @@
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+})
 const { colors } = require(`tailwindcss/defaultTheme`)
 const { fontFamily } = require("tailwindcss/defaultTheme")
 /** @type {import('tailwindcss').Config} \*/
 
-module.exports = {
+module.exports = withBundleAnalyzer({
   mode: "jit", // see https://tailwindcss.com/docs/just-in-time-mode
   purge: ["./components/**/*.js", "./pages/**/*.js"],
   darkMode: false, // or "media" or "class"
@@ -13,11 +16,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#00A07F",
+        primary: "#2d9664",
         secondary: "#004aad",
         dark: "#1F292E",
         darkgray: "#415058",
-        midgray: "#9ca3af",
+        midgray: "#9696a0",
         lightgray: "#F2F2F3",
         warning: "#FFAB1A",
         danger: "#D4111B",
@@ -38,10 +41,10 @@ module.exports = {
       },
     },
     fontSize: {
-      xs: "13px",
-      sm: "16px",
-      base: "20px",
-      lg: "25px",
+      xs: "14px",
+      sm: "17px",
+      base: "21px",
+      lg: "26px",
       xl: "32px",
       xxl: "45px",
     },
@@ -56,4 +59,4 @@ module.exports = {
     extend: {},
   },
   plugins: [require("@tailwindcss/typography")],
-}
+})

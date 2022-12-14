@@ -2,33 +2,30 @@ import React, { useState, useEffect } from "react"
 import { signOut, useSession } from "next-auth/react"
 import { useSelector, useDispatch } from "react-redux"
 import { replyComment, countComment } from "@/store/comment"
-import { getStrapiMedia } from "utils/media"
 import axios from "axios"
 import useSWR, { useSWRConfig } from "swr"
+import useSWRInfinite from "swr/infinite"
 import Image from "next/image"
-import Link from "next/link"
 import CommentsHeader from "./comments-header"
 import CommentHeader from "./comment-header"
 import CommentFooter from "./comment-footer"
 import CommentForm from "./comment-form"
 import { Toaster } from "react-hot-toast"
 import { MdPerson, MdOutlineReportProblem } from "react-icons/md"
-import { TbPoint, TbLoader } from "react-icons/tb"
+import { TbLoader } from "react-icons/tb"
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
-}
-const loader = ({ src, width }) => {
-  return getStrapiMedia(src)
 }
 
 const Comments = ({ article, slug }) => {
   const dispatch = useDispatch()
   const reply = useSelector((state) => state.comment.reply)
-  const [commentLimit, setCommentLimit] = useState(15)
+  const [commentLimit, setCommentLimit] = useState(100)
+  const countedComment = useSelector((state) => state.comment.countedComment)
   const userData = useSelector((state) => state.user.userData)
   const { data: session } = useSession()
   const { mutate } = useSWRConfig()
-  const address = `${process.env.NEXT_PUBLIC_SITE_URL}/api/comments?populate[author][populate]=%2A&populate[threadOf][fields][0]=id&populate[reply_to][fields][0]=id&filters[article][id][$eq]=${article}&filters[removed][$eq]=false&filters[$or][0][approvalStatus][$eq]=approved&filters[$or][1][approvalStatus][$eq]=ignored&pagination[start]=0&pagination[limit]=${commentLimit}&sort[0]=id%3Adesc`
+  const address = `${process.env.NEXT_PUBLIC_SITE_URL}/api/comments?populate[author][populate]=%2A&populate[threadOf][fields][0]=id&populate[reply_to][fields][0]=id&filters[article][id][$eq]=${article}&filters[removed][$eq]=false&filters[$or][0][approvalStatus][$eq]=approved&filters[$or][1][approvalStatus][$eq]=ignored&sort[0]=id%3Adesc`
   const fetcher = async (url) =>
     await axios
       .get(url, {
@@ -36,22 +33,49 @@ const Comments = ({ article, slug }) => {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
         },
       })
-      .then((res) => res.data)
-  const { data: commentArray, error } = useSWR(address, fetcher)
+      .then((res) => res.data.data)
+  //const { data: commentArray, error } = useSWR(address, fetcher)
+  const {
+    data: commentArray,
+    error,
+    size,
+    setSize,
+    isValidating,
+  } = useSWRInfinite(
+    (index) =>
+      `${address}&pagination[pageSize]=${commentLimit}&pagination[page]=${
+        index + 1
+      }`,
+    fetcher
+  )
+  const issues = commentArray ? [].concat(...commentArray) : []
+  const isLoadingInitialData = !commentArray && !error
+  const isLoadingMore =
+    isLoadingInitialData ||
+    (size > 0 && commentArray && typeof commentArray[size - 1] === "undefined")
+  const isEmpty = commentArray?.[0]?.length === 0
+  const isReachingEnd =
+    isEmpty ||
+    (commentArray &&
+      commentArray[commentArray.length - 1]?.length < commentLimit)
+  const isRefreshing =
+    isValidating && commentArray && commentArray.length === size
 
   const arrayToTree = (arr, parent = undefined) =>
     arr &&
-    arr.data &&
-    arr.data
+    arr
       .filter((item) => item.attributes.threadOf.data?.id === parent)
       .map((child) => ({ ...child, children: arrayToTree(arr, child.id) }))
-  const commentsAsTree = arrayToTree(commentArray)
-
+  const commentsAsTree = arrayToTree(issues)
   useEffect(() => {
-    commentArray &&
-      commentArray.data &&
-      dispatch(countComment(commentArray.meta.pagination.total))
-  }, [commentArray, dispatch])
+    axios
+      .get(address, {
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+        },
+      })
+      .then((res) => dispatch(countComment(res.data.meta.pagination.total)))
+  }, [address, dispatch])
 
   const CommentItems = (comments) => {
     return comments.map((comment) => (
@@ -68,7 +92,6 @@ const Comments = ({ article, slug }) => {
         <div className="flex-none w-[55px] h-[55px] relative">
           {comment.attributes.author.data.attributes.avatar.data ? (
             <Image
-              loader={loader}
               className="rounded"
               fill
               sizes="100vw"
@@ -138,70 +161,44 @@ const Comments = ({ article, slug }) => {
       </article>
     ))
   }
-
-  useEffect(() => {
-    if (!commentArray) return
-  }, [commentArray])
   return (
     <section className="commentSection mb-4">
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="flex flex-row items-center justify-between border-b border-midgray">
-        <h4 className="font-semibold text-base text-midgray">
-          YORUM YAZIN! {session ? "" : "(Üye olmadan da yorum yazabilirsiniz)"}
-        </h4>
-        <CommentsHeader />
-      </div>
+      <CommentsHeader />
       <CommentForm
         userData={userData}
         article={article}
         commentId="0"
         onNewComment={() => mutate(address)}
       />
-      {commentArray ? (
-        commentArray.meta.pagination.total > 0 ? (
+      {issues ? (
+        countedComment > 0 ? (
           <div className="flex flex-col gap-2 mt-4">
             <div className="flex justify-between items-center border-b border-midgray">
               <h4 className="font-semibold text-base text-midgray">Yorumlar</h4>
               <div className="flex">
-                <div className="flex flex-row gap-2 mr-4 font-light text-sm text-midgray">
-                  Son
-                  <ul className="flex items-center gap-2 text-secondary">
-                    {[15, 25, 50, 100]
-                      .filter(
-                        (limits) => commentArray.meta.pagination.total >= limits
-                      )
-                      .map((limit, i, limits) => (
-                        <li className="flex items-center gap-2" key={limit}>
-                          <button onClick={() => setCommentLimit(limit)}>
-                            {limit}
-                          </button>
-                          {i + 1 != limits.length && (
-                            <TbPoint className="text-midgray" />
-                          )}
-                        </li>
-                      ))}
-                    {commentArray.meta.pagination.total > 100 && (
-                      <li className="flex items-center gap-2">
-                        <TbPoint className="text-midgray" />
-                        <Link href={`${slug}/yorumlar`}>Tümü</Link>
-                      </li>
-                    )}
-                  </ul>
-                  yorum göster
-                </div>
                 <div className="font-semibold text-sm text-midgray">
-                  {commentArray.meta.pagination.total} yorum
+                  {countedComment} yorum
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-4">
               {CommentItems(commentsAsTree)}
             </div>
-            {commentArray && commentArray.meta.pagination.total > commentLimit && (
+            {issues && countedComment > commentLimit && (
               <div className="flex flex-col items-end gap-2 text-center">
-                <Link className="text-secondary" href={`${slug}/yorumlar`}>
-                  Tüm yorumları gör
-                </Link>
+                <button
+                  className="text-secondary hover:underline"
+                  disabled={isLoadingMore || isReachingEnd}
+                  onClick={() => setSize(size + 1)}
+                >
+                  {isLoadingMore
+                    ? "Yükleniyor..."
+                    : !isReachingEnd && "Daha fazla yorum yükle"}
+                </button>
+                {isReachingEnd && (
+                  <div className="text-midgray">Daha fazla yorum yok</div>
+                )}
               </div>
             )}
           </div>

@@ -20,7 +20,11 @@ const NotificationBanner = ({ data: { text, type }, closeSelf }) => {
           className="rich-text-banner flex-1"
           dangerouslySetInnerHTML={{ __html: text }}
         />
-        <button onClick={closeSelf} className="px-1 py-1 flex-shrink-0">
+        <button
+          title="Kapat"
+          onClick={closeSelf}
+          className="px-1 py-1 flex-shrink-0"
+        >
           <MdClose className="h-6 w-auto" color="#fff" />
         </button>
       </div>

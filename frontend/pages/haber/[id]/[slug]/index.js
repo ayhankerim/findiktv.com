@@ -8,7 +8,7 @@ import {
   getGlobalData,
 } from "@/utils/api"
 import Seo from "@/components/elements/seo"
-import NextImage from "@/components/elements/image"
+import Image from "next/image"
 import Breadcrumb from "@/components/elements/breadcrumb"
 import Advertisement from "@/components/elements/advertisement"
 import ArticleDates from "@/components/elements/date"
@@ -19,6 +19,9 @@ import ArticleComments from "@/components/elements/comments/comments"
 import { useRouter } from "next/router"
 import Layout from "@/components/layout"
 import { getLocalizedPaths } from "@/utils/localize"
+import ArticleRelations from "@/components/elements/article-relations"
+import LatestArticles from "@/components/elements/latest-articles"
+import ArticleSidebar from "@/components/elements/article-sidebar"
 
 // The file is called [[...slug]].js because we're using Next's
 // optional catch all routes feature. See the related docs:
@@ -66,7 +69,9 @@ const DynamicArticle = ({
           (placeholder) => placeholder.attributes.placeholder === position
         )[0].attributes.code
       default:
-        return "articleTop"
+        return advertisement.filter(
+          (placeholder) => placeholder.attributes.placeholder === position
+        )[0].attributes.code
     }
   }
   const createFullPostMarkup = () => {
@@ -74,18 +79,15 @@ const DynamicArticle = ({
     let NewsContentText = ""
     paraArray.forEach(myFunction)
     function myFunction(item, index) {
-      if (
-        Number((paraArray.length / 2).toFixed(0)) - 1 === index ||
-        index === 6
-      ) {
-        NewsContentText +=
-          item +
-          `<div class="adsInline"><div class="band"><span>REKLAM</span></div>${advertisementFunc(
-            "article-inline-desktop"
-          )}<div class="band"></div></div>`
-      } else {
-        NewsContentText += item
-      }
+      paraArray.length > 2 &&
+      index > 1 &&
+      index % 2 &&
+      paraArray.length - 1 != index
+        ? (NewsContentText +=
+            `<div class="adsInline"><div class="band"><span>REKLAM</span></div>${advertisementFunc(
+              "article-inline-desktop"
+            )}<div class="band"></div></div>` + item)
+        : (NewsContentText += item)
     }
     return {
       __html: `<div class="w-[336px] h-[280px] float-left mr-4 mb-4">${advertisementFunc(
@@ -94,7 +96,7 @@ const DynamicArticle = ({
     }
   }
   //dispatch(visitedArticle({ id: articleContent.id }))
-  //console.log("articleContent", articleContent.id)
+  //console.log("articleContent", articleContent)
   return (
     <Layout
       global={global}
@@ -105,15 +107,23 @@ const DynamicArticle = ({
       <Seo metadata={metadataWithDefaults} />
       {/* Display content sections */}
       {/* <Sections sections={sections} preview={preview} /> */}
-      <main className="container flex flex-row items-start justify-between gap-2 pt-2 bg-white">
+      <main className="container flex flex-col sm:flex-row items-start justify-between gap-4 pt-2 bg-white">
         <div className="flex-1">
           {/* Featured Image or Video Section*/}
-          <div className="mb-2">
-            <NextImage
-              width={articleContent.image.data.attributes.width}
-              height={articleContent.image.data.attributes.height}
-              media={articleContent.image}
+          <div className="mb-2 relative h-[500px]">
+            <Image
+              src={
+                articleContent.image.data.attributes.formats.large
+                  ? articleContent.image.data.attributes.formats.large.url
+                  : articleContent.image.data.attributes.formats.medium.url
+              }
+              alt={articleContent.image.data.attributes.alternativeText}
               className="rounded-lg"
+              priority={true}
+              fill
+              sizes="(max-width: 768px) 100vw,
+                (max-width: 800px) 50vw,
+                33vw"
             />
           </div>
           <Breadcrumb
@@ -149,6 +159,17 @@ const DynamicArticle = ({
               __html: advertisementFunc("article-bottom-desktop"),
             }}
           />
+          <ArticleRelations
+            cities={articleContent.cities}
+            tags={articleContent.tags}
+            title={articleContent.title}
+            slug={`${process.env.NEXT_PUBLIC_SITE_URL}/haber/${articleContent.id}/${articleContext.slug}`}
+          />
+          <LatestArticles
+            current={articleContent.id}
+            count={3}
+            position="bottom"
+          />
           {articleContent.reaction && (
             <ArticleReactions
               article={articleContent.id}
@@ -159,9 +180,13 @@ const DynamicArticle = ({
             article={articleContent.id}
             slug={`${process.env.NEXT_PUBLIC_SITE_URL}/haber/${articleContent.id}/${articleContext.slug}`}
             infinite={false}
+            advertisement={advertisement}
           />
         </div>
-        <aside className="sticky top-0 flex-none w-[336px]">Sidebar</aside>
+        <ArticleSidebar
+          articleId={articleContent.id}
+          advertisement={advertisement}
+        />
       </main>
     </Layout>
   )

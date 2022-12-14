@@ -16,6 +16,7 @@ import ViewCounter from "@/components/elements/pageviews"
 import ArticleShare from "@/components/elements/share"
 import ArticleReactions from "@/components/elements/reactions"
 import ArticleComments from "@/components/elements/comments/comments-infinite"
+import ArticleSidebar from "@/components/elements/article-sidebar"
 import { useRouter } from "next/router"
 import Layout from "@/components/layout"
 import { getLocalizedPaths } from "@/utils/localize"
@@ -107,6 +108,7 @@ const DynamicArticle = ({
             current={articleContent.title}
             slug={articleContext.slug}
             articleId={articleContent.id}
+            childType="comment"
           />
           <h1 className="font-extrabold text-xxl">
             {articleContent.title}{" "}
@@ -120,7 +122,10 @@ const DynamicArticle = ({
             infinite={true}
           />
         </div>
-        <aside className="sticky top-0 flex-none w-[336px]">Sidebar</aside>
+        <ArticleSidebar
+          articleId={articleContent.id}
+          advertisement={advertisement}
+        />
       </main>
     </Layout>
   )

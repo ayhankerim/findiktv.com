@@ -10,37 +10,40 @@ let emojis = [
   {
     id: "angry",
     title: "Kızgınım",
-    image: "/uploads/angry_2527bcc861.gif",
+    image: "/uploads/angry_3c2da737bc.gif?updated_at=2022-12-12T12:33:18.303Z",
   },
   {
     id: "sad",
     title: "Üzüldüm",
-    image: "/uploads/das_118d65fe99.gif",
+    image: "/uploads/sad_c58837fb89.gif?updated_at=2022-12-12T12:33:18.083Z",
   },
   {
     id: "dislike",
     title: "Sevmedim",
-    image: "/uploads/dislike_9ccbadb9bb.gif",
+    image:
+      "/uploads/dislike_17e65c1265.gif?updated_at=2022-12-12T12:33:18.090Z",
   },
   {
     id: "shocked",
     title: "Ben şok",
-    image: "/uploads/shocked_ca1e6d1790.gif",
+    image:
+      "/uploads/shocked_7879b8bc9e.gif?updated_at=2022-12-12T12:33:18.138Z",
   },
   {
     id: "love",
     title: "Sevdim",
-    image: "/uploads/love_4c7259b16b.gif",
+    image: "/uploads/love_923b6d2b63.gif?updated_at=2022-12-12T12:33:18.088Z",
   },
   {
     id: "applause",
     title: "Alkışı hakediyor",
-    image: "/uploads/applause_ba702e4eac.gif",
+    image:
+      "/uploads/applause_2175213bdc.gif?updated_at=2022-12-12T12:33:18.073Z",
   },
   {
     id: "lol",
     title: "Çok Komik",
-    image: "/uploads/lol_e619944f09.gif",
+    image: "/uploads/lol_bdbc0d5e86.gif?updated_at=2022-12-12T12:33:18.084Z",
   },
 ]
 
@@ -102,11 +105,11 @@ const Reactions = ({ article, reactions }) => {
         </h4>
         <MdOutlineEmojiEmotions className="text-lg text-midgray" />
       </div>
-      <div className="grid grid-cols-10 gap-1 text-xs mt-1 mb-4">
+      <div className="grid grid-cols-12 gap-1 text-xs mt-1 mb-4">
         {emojis.map((emoji) => {
           return (
             <div className="flex flex-col" key={emoji.id}>
-              <div className="flex flex-col h-[50px] justify-end mx-2 text-center">
+              <div className="flex flex-col h-[50px] justify-end mx-1 text-center">
                 <span className="h-[20px]">
                   {reactionsData ? reactionsData.data?.attributes[emoji.id] : 0}
                 </span>
@@ -120,7 +123,7 @@ const Reactions = ({ article, reactions }) => {
                         sum +
                       "px",
                   }}
-                  className="w-full h-[1px] bg-success transition duration-150 ease-out md:ease-in"
+                  className="w-full min-h-[1px] bg-success transition duration-150 ease-out md:ease-in"
                 ></div>
               </div>
               <Tooltip orientation="bottom" tooltipText={emoji.title}>
@@ -150,12 +153,11 @@ const Reactions = ({ article, reactions }) => {
                   }}
                 >
                   <Image
-                    layout="responsive"
-                    width="72"
-                    height="72"
-                    objectFit="contain"
+                    width="64"
+                    height="64"
                     src={emoji.image}
                     alt={emoji.title}
+                    unoptimized={true}
                   />
                 </button>
               </Tooltip>

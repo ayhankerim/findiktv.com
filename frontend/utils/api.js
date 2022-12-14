@@ -626,6 +626,92 @@ export async function createReaction(active) {
   return advertisement.data.advertisements.data
 }
 
+export async function getProductData({ slug, locale }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const productsRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+
+        query GetProducts(
+          $slug: String!
+          $locale: I18NLocaleCode!
+        )  {
+          products(
+            filters: { slug: { eq: $slug } }
+            locale: $locale
+          )  {
+            data {
+              id
+              attributes {
+                title
+                slug
+                content
+                featured {
+                  ...FileParts
+                }
+                createdAt
+                updatedAt
+                locale
+                localizations {
+                  data {
+                    id
+                    attributes {
+                      locale
+                    }
+                  }
+                }
+                metadata {
+                  metaTitle
+                  metaDescription
+                  shareImage {
+                    ...FileParts
+                  }
+                  twitterUsername
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        slug,
+        locale,
+      },
+    }),
+  })
+
+  const productsData = await productsRes.json()
+  // Make sure we found something, otherwise return null
+  if (
+    productsData.data?.products == null ||
+    productsData.data.products.length === 0
+  ) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return productsData.data.products.data[0]
+}
+
 // Get site data from Strapi (metadata, navbar, footer...)
 export async function getGlobalData(locale) {
   const gqlEndpoint = getStrapiURL("/graphql")

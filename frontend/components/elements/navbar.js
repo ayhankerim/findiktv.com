@@ -104,7 +104,9 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
                       passHref
                     >
                       <MdAutoGraph className="text-xxl m-4" />
-                      <span className="inline-flex m-2">Fiyatlar</span>
+                      <span className="inline-flex font-semibold m-2">
+                        Fiyatlar
+                      </span>
                     </Link>
                   </li>
                   <li className="transition duration-150 ease-out hover:ease-in hover:bg-dark shadow-sm hover:shadow-2xl hover:shadow-primary text-darkgray hover:text-white border border-darkgray rounded">
@@ -114,7 +116,9 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
                       passHref
                     >
                       <FiYoutube className="text-xxl m-4" />
-                      <span className="inline-flex m-2">İzle</span>
+                      <span className="inline-flex font-semibold m-2">
+                        İzle
+                      </span>
                     </Link>
                   </li>
                   <li className="transition duration-150 ease-out hover:ease-in hover:bg-primary shadow-sm hover:shadow-2xl hover:shadow-dark text-center text-primary hover:text-white border border-primary rounded">
@@ -126,7 +130,9 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
                         passHref
                       >
                         <MdLogout className="text-xxl m-4" />
-                        <span className="inline-flex m-2">Çıkış Yap</span>
+                        <span className="inline-flex font-semibold m-2">
+                          Çıkış Yap
+                        </span>
                       </Link>
                     ) : (
                       <Link
@@ -135,7 +141,9 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
                         passHref
                       >
                         <MdLogin className="text-xxl m-4" />
-                        <span className="inline-flex m-2">Giriş Yap</span>
+                        <span className="inline-flex font-semibold m-2">
+                          Giriş Yap
+                        </span>
                       </Link>
                     )}
                   </li>
@@ -151,7 +159,7 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
             <ul className="hidden list-none md:flex flex-row gap-4 items-baseline">
               {navbar.links.map((navLink) => (
                 <li
-                  className="border-b-2 border-transparent hover:border-b-2 hover:border-b-secondary "
+                  className="border-b-2 border-transparent hover:border-b-2 hover:border-b-secondary hover:bg-lightgray"
                   key={navLink.id}
                 >
                   <CustomLink link={navLink} locale={router.locale}>
@@ -166,7 +174,7 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
           <div className="flex flex-row items-center relative bottom-[-2px]">
             <ul className="hidden list-none md:flex flex-row gap-4 items-baseline">
               <li className="border-b-2 border-transparent">
-                <Link href="#" passHref>
+                <Link title="Ara" href="#" passHref>
                   <div className="text-xl font-bold hover:text-secondary px-2 py-1">
                     <MdOutlineSearch />
                   </div>
