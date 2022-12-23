@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import ErrorPage from "next/error"
 import {
-  getProductData,
+  getCityData,
   getAdsData,
   //getCommentsData,
   fetchAPI,
@@ -17,17 +17,17 @@ import Layout from "@/components/layout"
 // optional catch all routes feature. See the related docs:
 // https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes
 
-const DynamicProducts = ({
-  productContent,
+const DynamicCities = ({
+  cityContent,
   advertisement,
   metadata,
   preview,
   global,
-  productContext,
+  cityContext,
 }) => {
   const router = useRouter()
   // Check if the required data was provided
-  if (!router.isFallback && !productContent.content?.length) {
+  if (!router.isFallback && !cityContent) {
     return <ErrorPage statusCode={404} />
   }
 
@@ -37,18 +37,18 @@ const DynamicProducts = ({
   }
 
   // Merge default site SEO settings with page specific SEO settings
-  if (metadata.shareImage?.data == null) {
+  if (metadata && metadata.shareImage.data == null) {
     delete metadata.shareImage
   }
   const metadataWithDefaults = {
     ...global.attributes.metadata,
     ...metadata,
   }
-  console.log("productContent", productContent)
+  console.log("cityContent", cityContent)
   return (
     <Layout
       global={global}
-      pageContext={productContext}
+      pageContext={cityContext}
       advertisement={advertisement}
     >
       {/* Add meta tags for SEO*/}
@@ -56,7 +56,7 @@ const DynamicProducts = ({
       {/* Display content sections */}
       {/* <Sections sections={sections} preview={preview} /> */}
       <main className="container flex flex-col sm:flex-row items-start justify-between gap-4 pt-2 bg-white">
-        test
+        <div className="relative h-20 w-20">{cityContent.title}</div>
       </main>
     </Layout>
   )
@@ -64,25 +64,25 @@ const DynamicProducts = ({
 
 export async function getStaticPaths(context) {
   // Get all pages from Strapi
-  const products = await context.locales.reduce(
-    async (currentProductsPromise, locale) => {
-      const currentProducts = await currentProductsPromise
-      const localeProducts = await fetchAPI("/products", {
+  const cities = await context.locales.reduce(
+    async (currentcitiesPromise, locale) => {
+      const currentcities = await currentcitiesPromise
+      const localecities = await fetchAPI("/cities", {
         locale,
         fields: ["slug", "locale"],
       })
-      return [...currentProducts, ...localeProducts.data]
+      return [...currentcities, ...localecities.data]
     },
     Promise.resolve([])
   )
 
-  const paths = products.map((product) => {
-    const { slug, locale } = product.attributes
+  const paths = cities.map((city) => {
+    const { slug, locale } = city.attributes
     // Decompose the slug that was saved in Strapi
     const slugArray = !slug ? false : slug
 
     return {
-      params: { product: slugArray },
+      params: { slug: slugArray },
       // Specify the locale to render
       locale,
     }
@@ -96,31 +96,27 @@ export async function getStaticProps(context) {
 
   const globalLocale = await getGlobalData(locale)
   const advertisement = await getAdsData()
-  //const comments = params ? await getCommentsData(params.id) : null
-  //console.log(JSON.stringify(comments))
   // Fetch pages. Include drafts if preview mode is on
-  const productData = await getProductData({
-    slug: params.product,
+  const cityData = await getCityData({
+    slug: params.slug,
     locale,
   })
 
-  if (productData == null) {
+  if (cityData == null) {
     // Giving the page no props will trigger a 404 page
     return { props: {} }
   }
 
   // We have the required page data, pass it to the page component
-  const { title, content, featured, metadata, localizations, slug } =
-    productData.attributes
+  const { title, content, metadata, localizations, slug } = cityData.attributes
 
-  const productContent = {
-    id: productData.id,
+  const cityContent = {
+    id: cityData.id,
     title,
     content,
-    featured,
   }
 
-  const productContext = {
+  const cityContext = {
     locale,
     locales,
     defaultLocale,
@@ -132,17 +128,17 @@ export async function getStaticProps(context) {
 
   return {
     props: {
-      productContent: productContent,
+      cityContent: cityContent,
       advertisement: advertisement,
       metadata,
       global: globalLocale.data,
-      productContext: {
-        ...productContext,
+      cityContext: {
+        ...cityContext,
         //localizedPaths,
       },
     },
-    revalidate: 60,
+    revalidate: 600,
   }
 }
 
-export default DynamicProducts
+export default DynamicCities

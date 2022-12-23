@@ -46,25 +46,10 @@
       "target": "api::city.city",
       "inversedBy": "prices"
     },
-    "name": {
-      "type": "string",
-      "minLength": 5,
-      "maxLength": 100
-    },
-    "email": {
-      "type": "email"
-    },
-    "user_type": {
-      "type": "enumeration",
-      "enum": [
-        "system",
-        "producer",
-        "merchant"
-      ],
-      "default": "system"
-    },
-    "ip": {
-      "type": "string"
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

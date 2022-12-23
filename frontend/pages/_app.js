@@ -22,7 +22,7 @@ const dosis = Dosis({
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
   // Extract the data we need
   const { global } = pageProps
-  if (global == null) {
+  if (global == null || global.data) {
     return <ErrorPage statusCode={404} />
   }
 

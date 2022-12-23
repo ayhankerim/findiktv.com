@@ -104,9 +104,9 @@ export default function ProfileCard({ children, author }) {
                           <p className="flex items-center gap-1 mb-3 text-sm font-normal">
                             {author.attributes.city.data && (
                               <>
-                                <address className="not-italic">
+                                <span className="not-italic">
                                   {author.attributes.city.data.attributes.title}
-                                </address>
+                                </span>
                                 <BsDot />
                               </>
                             )}

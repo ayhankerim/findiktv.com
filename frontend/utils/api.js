@@ -397,6 +397,324 @@ export async function getArticleData({ slug, locale, id, preview }) {
   return articlesData.data.articles.data[0]
 }
 
+export async function getCategoryData({ slug, locale, preview }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const categoriesRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+
+        query GetCategories($slug: String!, $locale: I18NLocaleCode!) {
+          categories(
+            filters: {
+              slug: { eq: $slug }
+            }
+            locale: $locale
+          ) {
+            data {
+              id
+              attributes {
+                title
+                slug
+                content
+                createdAt
+                updatedAt
+                metadata {
+                  metaTitle
+                  metaDescription
+                  shareImage {
+                    ...FileParts
+                  }
+                  twitterUsername
+                }
+                locale
+                localizations {
+                  data {
+                    id
+                    attributes {
+                      locale
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        slug,
+        locale,
+      },
+    }),
+  })
+
+  const categoriesData = await categoriesRes.json()
+  // Make sure we found something, otherwise return null
+  if (
+    categoriesData.data?.categories == null ||
+    categoriesData.data.categories.length === 0
+  ) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return categoriesData.data.categories.data[0]
+}
+
+export async function getCategoryArticlesData({ category, locale, preview }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const categoriesArticlesRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              formats
+            }
+          }
+        }
+
+        query GetArticles(
+          $category: String!
+          $locale: I18NLocaleCode!
+        ) {
+          articles(
+            filters: {
+              category: { slug: { eq: $category } }
+            }
+            locale: $locale
+            sort: "id:desc"
+            pagination: { start: 0, limit: 5}
+          ) {
+            data {
+              id
+              attributes {
+                title
+                slug
+                summary
+                image {
+                  ...FileParts
+                }
+                category {
+                  data {
+                    attributes {
+                      slug
+                    }
+                  }
+                }
+                featured
+                locale
+                updatedAt
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        category,
+        locale,
+      },
+    }),
+  })
+
+  const categorieArticlesData = await categoriesArticlesRes.json()
+  // Make sure we found something, otherwise return null
+  if (
+    categorieArticlesData.data?.articles == null ||
+    categorieArticlesData.data.articles.length === 0
+  ) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return categorieArticlesData.data.articles.data
+}
+
+export async function getCityData({ slug, locale, preview }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const citiesRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+
+        query getCities($slug: String!, $locale: I18NLocaleCode!) {
+          cities(
+            filters: {
+              slug: { eq: $slug }
+            }
+            locale: $locale
+          ) {
+            data {
+              id
+              attributes {
+                title
+                slug
+                content
+                createdAt
+                updatedAt
+                metadata {
+                  metaTitle
+                  metaDescription
+                  shareImage {
+                    ...FileParts
+                  }
+                  twitterUsername
+                }
+                locale
+                localizations {
+                  data {
+                    id
+                    attributes {
+                      locale
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        slug,
+        locale,
+      },
+    }),
+  })
+
+  const citiesData = await citiesRes.json()
+  // Make sure we found something, otherwise return null
+  if (citiesData.data?.cities == null || citiesData.data.cities.length === 0) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return citiesData.data.cities.data[0]
+}
+
+export async function getTagData({ slug, locale, preview }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const tagsRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+
+        query getTags($slug: String!, $locale: I18NLocaleCode!) {
+          tags(
+            filters: {
+              slug: { eq: $slug }
+            }
+            locale: $locale
+          ) {
+            data {
+              id
+              attributes {
+                title
+                slug
+                createdAt
+                updatedAt
+                metadata {
+                  metaTitle
+                  metaDescription
+                  shareImage {
+                    ...FileParts
+                  }
+                  twitterUsername
+                }
+                locale
+                localizations {
+                  data {
+                    id
+                    attributes {
+                      locale
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        slug,
+        locale,
+      },
+    }),
+  })
+
+  const tagsData = await tagsRes.json()
+  // Make sure we found something, otherwise return null
+  if (tagsData.data?.tags == null || tagsData.data.tags.length === 0) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return tagsData.data.tags.data[0]
+}
+
 export async function getAdsData(active) {
   const gqlEndpoint = getStrapiURL("/graphql")
   const adsRes = await fetch(gqlEndpoint, {
@@ -626,7 +944,7 @@ export async function createReaction(active) {
   return advertisement.data.advertisements.data
 }
 
-export async function getProductData({ slug, locale }) {
+export async function getProductData({ product, locale }) {
   // Find the pages that match this slug
   const gqlEndpoint = getStrapiURL("/graphql")
   const productsRes = await fetch(gqlEndpoint, {
@@ -652,11 +970,11 @@ export async function getProductData({ slug, locale }) {
         }
 
         query GetProducts(
-          $slug: String!
+          $product: String!
           $locale: I18NLocaleCode!
         )  {
           products(
-            filters: { slug: { eq: $slug } }
+            filters: { slug: { eq: $product } }
             locale: $locale
           )  {
             data {
@@ -693,7 +1011,7 @@ export async function getProductData({ slug, locale }) {
         }
       `,
       variables: {
-        slug,
+        product,
         locale,
       },
     }),
@@ -710,6 +1028,102 @@ export async function getProductData({ slug, locale }) {
 
   // Return the first item since there should only be one result per slug
   return productsData.data.products.data[0]
+}
+
+export async function getProductCityData({ city, product, locale }) {
+  // Find the pages that match this slug
+  const gqlEndpoint = getStrapiURL("/graphql")
+  const citiesRes = await fetch(gqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+        fragment FileParts on UploadFileEntityResponse {
+          data {
+            id
+            attributes {
+              alternativeText
+              width
+              height
+              mime
+              url
+              formats
+            }
+          }
+        }
+
+        query getCities($city: String!, $product: String!, $locale: I18NLocaleCode!) {
+          cities(
+            filters: {
+              slug: { eq: $city }
+              prices: { product: { slug: { eq: $product } } }
+            }
+            locale: $locale
+          ) {
+            data {
+              id
+              attributes {
+                title
+                slug
+                content
+                createdAt
+                updatedAt
+                prices {
+                  data {
+                    id
+                    attributes {
+                      product {
+                        data {
+                          id
+                          attributes {
+                            slug
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                metadata {
+                  metaTitle
+                  metaDescription
+                  shareImage {
+                    ...FileParts
+                  }
+                  twitterUsername
+                }
+                locale
+                localizations {
+                  data {
+                    id
+                    attributes {
+                      locale
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        city,
+        product,
+        locale,
+      },
+    }),
+  })
+
+  const citiesData = await citiesRes.json()
+  // Make sure we found something, otherwise return null
+  if (citiesData.data?.cities == null || citiesData.data.cities.length === 0) {
+    return null
+  }
+
+  // Return the first item since there should only be one result per slug
+  return citiesData.data.cities.data[0]
 }
 
 // Get site data from Strapi (metadata, navbar, footer...)

@@ -42,10 +42,10 @@ const Breadcrumb = ({ parent, current, slug, articleId, childType }) => {
             itemProp="item"
             itemScope=""
             itemType="http://schema.org/WebPage"
-            itemID={`/${parent.slug}`}
+            itemID={`/kategori/${parent.slug}`}
           >
             <Link
-              href={`/${parent.slug}`}
+              href={`/kategori/${parent.slug}`}
               className="hover:underline underline-offset-4 hover:text-darkgray"
               itemProp="url"
               passHref

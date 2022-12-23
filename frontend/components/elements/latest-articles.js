@@ -84,7 +84,10 @@ const LatestArticles = ({
               )}
               <Link
                 href={`/haber/${article.id}/${article.attributes.slug}`}
-                className={`${styles.cCard} block bg-lightgray rounded border border-b-2 overflow-hidden`}
+                className={classNames(
+                  position === "bottom" ? "h-full" : "",
+                  `${styles.cCard} block bg-lightgray rounded border border-b-2 overflow-hidden`
+                )}
               >
                 <div className="relative border-b-4 border-primary pb-36 overflow-hidden">
                   <Image
