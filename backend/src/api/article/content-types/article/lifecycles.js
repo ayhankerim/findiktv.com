@@ -1,8 +1,6 @@
 module.exports = {
     afterCreate(event) {
-        const { result, params } = event;
-        console.log(result)
-        
+        const { result, params } = event;        
         strapi.db.query('api::reaction.reaction').create({
             data: {
                 article: result.id,

@@ -80,7 +80,7 @@ const DynamicCategories = ({
   }
 
   // Merge default site SEO settings with page specific SEO settings
-  if (metadata && metadata.shareImage.data == null) {
+  if (metadata && metadata.shareImage?.data == null) {
     delete metadata.shareImage
   }
   const metadataWithDefaults = {

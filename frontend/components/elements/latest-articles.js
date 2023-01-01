@@ -107,16 +107,18 @@ const LatestArticles = ({
                   />
                 </div>
                 <div className="relative p-4">
-                  <div
-                    className="absolute top-[-1rem] text-white right-2 rounded px-1"
-                    style={{
-                      backgroundColor: categoryColor(
-                        article.attributes.category.data.attributes.slug
-                      ),
-                    }}
-                  >
-                    {article.attributes.category.data.attributes.title}
-                  </div>
+                  {article.attributes.category.data && (
+                    <div
+                      className="absolute top-[-1rem] text-white right-2 rounded px-1"
+                      style={{
+                        backgroundColor: categoryColor(
+                          article.attributes.category.data.attributes.slug
+                        ),
+                      }}
+                    >
+                      {article.attributes.category.data.attributes.title}
+                    </div>
+                  )}
                   <h3 className="font-semibold">{article.attributes.title}</h3>
                 </div>
               </Link>

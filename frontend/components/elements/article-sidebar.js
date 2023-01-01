@@ -6,15 +6,15 @@ const ArticleSidebar = ({ articleId, advertisement }) => {
       case "sidebar-top-desktop":
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
       case "sidebar-bottom-desktop":
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
       default:
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
     }
   }
   return (
@@ -34,7 +34,7 @@ const ArticleSidebar = ({ articleId, advertisement }) => {
           advertisement.filter(
             (placeholder) =>
               placeholder.attributes.placeholder === "sidebar-middle-desktop"
-          )[0].attributes.code
+          )[0]?.attributes.code
         }
       />
       <div

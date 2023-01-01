@@ -64,7 +64,9 @@
         }
       },
       "type": "string",
-      "regex": "^$|^[a-zA-Z/-]+$"
+      "regex": "^$|^[a-zA-Z/-]+$",
+      "unique": false,
+      "required": true
     }
   }
 }

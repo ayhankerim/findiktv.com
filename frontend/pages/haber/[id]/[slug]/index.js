@@ -23,10 +23,6 @@ import ArticleRelations from "@/components/elements/article-relations"
 import LatestArticles from "@/components/elements/latest-articles"
 import ArticleSidebar from "@/components/elements/article-sidebar"
 
-// The file is called [[...slug]].js because we're using Next's
-// optional catch all routes feature. See the related docs:
-// https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes
-
 const DynamicArticle = ({
   articleContent,
   advertisement,
@@ -59,19 +55,19 @@ const DynamicArticle = ({
       case "article-top-desktop":
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
       case "article-inline-desktop":
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
       case "article-bottom-desktop":
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
       default:
         return advertisement.filter(
           (placeholder) => placeholder.attributes.placeholder === position
-        )[0].attributes.code
+        )[0]?.attributes.code
     }
   }
   const createFullPostMarkup = () => {
@@ -95,7 +91,6 @@ const DynamicArticle = ({
       )}</div>${NewsContentText}`,
     }
   }
-  //dispatch(visitedArticle({ id: articleContent.id }))
   //console.log("articleContent", articleContent)
   return (
     <Layout
@@ -127,7 +122,11 @@ const DynamicArticle = ({
             />
           </div>
           <Breadcrumb
-            parent={articleContent.category.data.attributes}
+            parent={
+              articleContent.category.data
+                ? articleContent.category.data.attributes
+                : null
+            }
             current={articleContent.title}
             slug={articleContext.slug}
             articleId={articleContent.id}
@@ -141,7 +140,7 @@ const DynamicArticle = ({
               publishedAt={articleContent.publishedAt}
               updatedAt={articleContent.updatedAt}
             />
-            <ViewCounter slug={articleContext.slug} blogPage={true} />
+            <ViewCounter articleId={articleContent.id} blogPage={true} />
           </div>
           <ArticleShare
             position="articleTop"

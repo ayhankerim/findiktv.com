@@ -42,16 +42,16 @@ const Breadcrumb = ({ parent, current, slug, articleId, childType }) => {
             itemProp="item"
             itemScope=""
             itemType="http://schema.org/WebPage"
-            itemID={`/kategori/${parent.slug}`}
+            itemID={`/kategori/${parent ? parent.slug : "gundem"}`}
           >
             <Link
-              href={`/kategori/${parent.slug}`}
+              href={`/kategori/${parent ? parent.slug : "gundem"}`}
               className="hover:underline underline-offset-4 hover:text-darkgray"
               itemProp="url"
               passHref
             >
               <span itemProp="name">
-                {parent.title.toLocaleUpperCase(locale)}
+                {parent ? parent.title.toLocaleUpperCase(locale) : "GÜNDEM"}
               </span>
             </Link>
           </span>

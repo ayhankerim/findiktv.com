@@ -81,7 +81,7 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
                 advertisement.filter(
                   (placeholder) =>
                     placeholder.attributes.placeholder === "header-top-desktop"
-                )[0].attributes.code
+                )[0]?.attributes.code
               }
             />
           </div>
@@ -189,7 +189,7 @@ const Navbar = ({ navbar, pageContext, advertisement }) => {
               advertisement.filter(
                 (placeholder) =>
                   placeholder.attributes.placeholder === "header-big-desktop"
-              )[0].attributes.code
+              )[0]?.attributes.code
             }
           />
         </div>
